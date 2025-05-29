@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIプロンプト生成・管理ツール - プロ版（改良）</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .random-toggle, .display-toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .random-toggle input, .display-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .display-toggle input:checked + .slider {
+            background-color: #10b981;
+        }
+        .scene-tab {
+            transition: all 0.3s ease;
+        }
+        .scene-tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .prompt-item {
+            border-left: 4px solid #3b82f6;
+            background: #f8fafc;
+        }
+        .category-disabled {
+            opacity: 0.5;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
+            <i class="fas fa-magic mr-3"></i>AIプロンプト生成・管理ツール - プロ版
+        </h1>
+
+        <!-- メインタブ -->
+        <div class="mb-6">
+            <div class="flex border-b">
+                <button id="tab-generate" class="px-6 py-3 bg-blue-500 text-white rounded-t-lg font-semibold">
+                    <i class="fas fa-wand-magic mr-2"></i>プロンプト生成
+                </button>
+                <button id="tab-scenes" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-t-lg font-semibold ml-2">
+                    <i class="fas fa-save mr-2"></i>シーン管理
+                </button>
+                <button id="tab-overview" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-t-lg font-semibold ml-2">
+                    <i class="fas fa-list mr-2"></i>全シーン一覧
+                </button>
+            </div>
+        </div>
+
+        <!-- プロンプト生成タブ -->
+        <div id="content-generate" class="tab-content">
+            <!-- 年齢設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-age">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-user mr-2"></i>年齢</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-age" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-age">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <input type="number" id="age" class="w-full px-3 py-2 border rounded-lg" min="18" max="99" value="22" placeholder="年齢を入力">
+            </div>
+
+            <!-- 人数設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-people">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-users mr-2"></i>人数</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-people" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-people">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="people-options">
+                    <label class="flex items-center"><input type="checkbox" value="1girl" class="mr-2">1人（女性）</label>
+                    <label class="flex items-center"><input type="checkbox" value="2girls" class="mr-2">2人（女性）</label>
+                    <label class="flex items-center"><input type="checkbox" value="3girls" class="mr-2">3人（女性）</label>
+                    <label class="flex items-center"><input type="checkbox" value="harem" class="mr-2">ハーレム</label>
+                    <label class="flex items-center"><input type="checkbox" value="1girl, 1boy" class="mr-2">妊婦・男性</label>
+                </div>
+            </div>
+
+            <!-- 背景設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-background">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-image mr-2"></i>背景</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-background" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-background">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="background-options">
+                    <label class="flex items-center"><input type="checkbox" value="bedroom" class="mr-2">寝室</label>
+                    <label class="flex items-center"><input type="checkbox" value="bathroom" class="mr-2">浴室</label>
+                    <label class="flex items-center"><input type="checkbox" value="living room" class="mr-2">リビング</label>
+                    <label class="flex items-center"><input type="checkbox" value="kitchen" class="mr-2">キッチン</label>
+                    <label class="flex items-center"><input type="checkbox" value="office" class="mr-2">オフィス</label>
+                    <label class="flex items-center"><input type="checkbox" value="classroom" class="mr-2">教室</label>
+                    <label class="flex items-center"><input type="checkbox" value="library" class="mr-2">図書館</label>
+                    <label class="flex items-center"><input type="checkbox" value="park" class="mr-2">公園</label>
+                    <label class="flex items-center"><input type="checkbox" value="beach" class="mr-2">ビーチ</label>
+                    <label class="flex items-center"><input type="checkbox" value="hotel room" class="mr-2">ホテル</label>
+                    <label class="flex items-center"><input type="checkbox" value="outdoors" class="mr-2">屋外</label>
+                    <label class="flex items-center"><input type="checkbox" value="car interior" class="mr-2">車内</label>
+                    <label class="flex items-center"><input type="checkbox" value="train" class="mr-2">電車</label>
+                    <label class="flex items-center"><input type="checkbox" value="elevator" class="mr-2">エレベーター</label>
+                    <label class="flex items-center"><input type="checkbox" value="rooftop" class="mr-2">屋上</label>
+                </div>
+            </div>
+
+            <!-- 服装設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-clothing">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-tshirt mr-2"></i>服装</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-clothing" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-clothing">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="clothing-options">
+                    <label class="flex items-center"><input type="checkbox" value="nude" class="mr-2">裸・ヌード</label>
+                    <label class="flex items-center"><input type="checkbox" value="topless" class="mr-2">トップレス</label>
+                    <label class="flex items-center"><input type="checkbox" value="bottomless" class="mr-2">ボトムレス</label>
+                    <label class="flex items-center"><input type="checkbox" value="panties" class="mr-2">パンツ</label>
+                    <label class="flex items-center"><input type="checkbox" value="no panties" class="mr-2">ノーパン</label>
+                    <label class="flex items-center"><input type="checkbox" value="bra" class="mr-2">ブラジャー</label>
+                    <label class="flex items-center"><input type="checkbox" value="skirt" class="mr-2">スカート</label>
+                    <label class="flex items-center"><input type="checkbox" value="mini skirt" class="mr-2">ミニスカート</label>
+                    <label class="flex items-center"><input type="checkbox" value="dress" class="mr-2">ドレス</label>
+                    <label class="flex items-center"><input type="checkbox" value="school uniform" class="mr-2">制服・学生服</label>
+                    <label class="flex items-center"><input type="checkbox" value="maid outfit" class="mr-2">メイド服</label>
+                    <label class="flex items-center"><input type="checkbox" value="nurse outfit" class="mr-2">ナース服</label>
+                    <label class="flex items-center"><input type="checkbox" value="cosplay" class="mr-2">コスプレ</label>
+                    <label class="flex items-center"><input type="checkbox" value="bikini" class="mr-2">ビキニ</label>
+                    <label class="flex items-center"><input type="checkbox" value="lingerie" class="mr-2">ランジェリー</label>
+                    <label class="flex items-center"><input type="checkbox" value="fishnet stockings" class="mr-2">網タイツ</label>
+                    <label class="flex items-center"><input type="checkbox" value="thigh highs" class="mr-2">ニーハイ</label>
+                    <label class="flex items-center"><input type="checkbox" value="stockings" class="mr-2">ストッキング</label>
+                    <label class="flex items-center"><input type="checkbox" value="knee highs" class="mr-2">ミドルニーソックス</label>
+                    <label class="flex items-center"><input type="checkbox" value="garter belt" class="mr-2">ガーターベルト</label>
+                </div>
+            </div>
+
+            <!-- ポーズ設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-pose">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-running mr-2"></i>ポーズ</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-pose" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-pose">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="pose-options">
+                    <label class="flex items-center"><input type="checkbox" value="standing" class="mr-2">立っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="sitting" class="mr-2">座っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="lying" class="mr-2">横になっている</label>
+                    <label class="flex items-center"><input type="checkbox" value="legs spread" class="mr-2">開脚</label>
+                    <label class="flex items-center"><input type="checkbox" value="cowgirl position" class="mr-2">騎乗位</label>
+                    <label class="flex items-center"><input type="checkbox" value="doggy style" class="mr-2">後背位</label>
+                    <label class="flex items-center"><input type="checkbox" value="missionary" class="mr-2">正常位</label>
+                    <label class="flex items-center"><input type="checkbox" value="bent over" class="mr-2">かがんでいる</label>
+                    <label class="flex items-center"><input type="checkbox" value="squatting" class="mr-2">しゃがんでいる</label>
+                    <label class="flex items-center"><input type="checkbox" value="kneeling" class="mr-2">膝をついている</label>
+                    <label class="flex items-center"><input type="checkbox" value="all fours" class="mr-2">四つん這い</label>
+                    <label class="flex items-center"><input type="checkbox" value="arms up" class="mr-2">両手を上げている</label>
+                    <label class="flex items-center"><input type="checkbox" value="hands behind head" class="mr-2">頭の後ろに手を回している</label>
+                    <label class="flex items-center"><input type="checkbox" value="touching breasts" class="mr-2">胸を触っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="masturbation" class="mr-2">自慰行為</label>
+                </div>
+            </div>
+
+            <!-- フェチ設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-fetish">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-heart mr-2"></i>フェチ</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-fetish" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-fetish">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="fetish-options">
+                    <label class="flex items-center"><input type="checkbox" value="ahegao" class="mr-2">アヘ顔</label>
+                    <label class="flex items-center"><input type="checkbox" value="lactation" class="mr-2">母乳</label>
+                    <label class="flex items-center"><input type="checkbox" value="pregnant" class="mr-2">妊娠</label>
+                    <label class="flex items-center"><input type="checkbox" value="bukkake" class="mr-2">ぶっかけ</label>
+                    <label class="flex items-center"><input type="checkbox" value="cumshot" class="mr-2">射精</label>
+                    <label class="flex items-center"><input type="checkbox" value="creampie" class="mr-2">中出し</label>
+                    <label class="flex items-center"><input type="checkbox" value="anal" class="mr-2">アナル</label>
+                    <label class="flex items-center"><input type="checkbox" value="double penetration" class="mr-2">二穴責め</label>
+                    <label class="flex items-center"><input type="checkbox" value="tentacles" class="mr-2">触手</label>
+                    <label class="flex items-center"><input type="checkbox" value="monster" class="mr-2">モンスター</label>
+                    <label class="flex items-center"><input type="checkbox" value="futanari" class="mr-2">ふたなり</label>
+                    <label class="flex items-center"><input type="checkbox" value="urination" class="mr-2">放尿</label>
+                    <label class="flex items-center"><input type="checkbox" value="squirting" class="mr-2">潮吹き</label>
+                    <label class="flex items-center"><input type="checkbox" value="interracial" class="mr-2">異人種間</label>
+                    <label class="flex items-center"><input type="checkbox" value="group sex" class="mr-2">乱交</label>
+                </div>
+            </div>
+
+            <!-- SM・拘束設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-bondage">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-link mr-2"></i>SM・拘束</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-bondage" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-bondage">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="bondage-options">
+                    <label class="flex items-center"><input type="checkbox" value="bondage" class="mr-2">拘束</label>
+                    <label class="flex items-center"><input type="checkbox" value="rope bondage" class="mr-2">縄縛り</label>
+                    <label class="flex items-center"><input type="checkbox" value="handcuffs" class="mr-2">手錠</label>
+                    <label class="flex items-center"><input type="checkbox" value="collar" class="mr-2">首輪</label>
+                    <label class="flex items-center"><input type="checkbox" value="leash" class="mr-2">リード</label>
+                    <label class="flex items-center"><input type="checkbox" value="chains" class="mr-2">鎖</label>
+                    <label class="flex items-center"><input type="checkbox" value="ball gag" class="mr-2">ボールギャグ</label>
+                    <label class="flex items-center"><input type="checkbox" value="blindfold" class="mr-2">目隠し</label>
+                    <label class="flex items-center"><input type="checkbox" value="spreader bar" class="mr-2">開脚器</label>
+                    <label class="flex items-center"><input type="checkbox" value="straitjacket" class="mr-2">拘束衣</label>
+                    <label class="flex items-center"><input type="checkbox" value="latex" class="mr-2">ラテックス</label>
+                    <label class="flex items-center"><input type="checkbox" value="leather" class="mr-2">レザー</label>
+                    <label class="flex items-center"><input type="checkbox" value="whip" class="mr-2">鞭</label>
+                    <label class="flex items-center"><input type="checkbox" value="spanking" class="mr-2">スパンキング</label>
+                    <label class="flex items-center"><input type="checkbox" value="cage" class="mr-2">檻</label>
+                </div>
+            </div>
+
+            <!-- 体型設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-body">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-female mr-2"></i>体型</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-body" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-body">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="body-options">
+                    <label class="flex items-center"><input type="checkbox" value="small breasts" class="mr-2">小さい胸</label>
+                    <label class="flex items-center"><input type="checkbox" value="medium breasts" class="mr-2">普通の胸</label>
+                    <label class="flex items-center"><input type="checkbox" value="large breasts" class="mr-2">大きい胸</label>
+                    <label class="flex items-center"><input type="checkbox" value="huge breasts" class="mr-2">巨乳</label>
+                    <label class="flex items-center"><input type="checkbox" value="slim" class="mr-2">スリム</label>
+                    <label class="flex items-center"><input type="checkbox" value="curvy" class="mr-2">グラマラス</label>
+                    <label class="flex items-center"><input type="checkbox" value="thick thighs" class="mr-2">太い太もも</label>
+                    <label class="flex items-center"><input type="checkbox" value="wide hips" class="mr-2">広い腰</label>
+                </div>
+            </div>
+
+            <!-- 髪型・髪色設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-hair">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-cut mr-2"></i>髪型・髪色</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-hair" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-hair">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-semibold mb-2">髪型</h4>
+                        <div class="checkbox-group" id="hairstyle-options">
+                            <label class="flex items-center"><input type="checkbox" value="long hair" class="mr-2">ロングヘア</label>
+                            <label class="flex items-center"><input type="checkbox" value="short hair" class="mr-2">ショートヘア</label>
+                            <label class="flex items-center"><input type="checkbox" value="medium hair" class="mr-2">ミディアムヘア</label>
+                            <label class="flex items-center"><input type="checkbox" value="twintails" class="mr-2">ツインテール</label>
+                            <label class="flex items-center"><input type="checkbox" value="ponytail" class="mr-2">ポニーテール</label>
+                            <label class="flex items-center"><input type="checkbox" value="braided hair" class="mr-2">三つ編み</label>
+                            <label class="flex items-center"><input type="checkbox" value="bangs" class="mr-2">前髪</label>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2">髪色</h4>
+                        <div class="checkbox-group" id="haircolor-options">
+                            <label class="flex items-center"><input type="checkbox" value="blonde hair" class="mr-2">金髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="brown hair" class="mr-2">茶髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="black hair" class="mr-2">黒髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="red hair" class="mr-2">赤髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="blue hair" class="mr-2">青髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="pink hair" class="mr-2">ピンク髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="purple hair" class="mr-2">紫髪</label>
+                            <label class="flex items-center"><input type="checkbox" value="white hair" class="mr-2">白髪</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 生成されたプロンプト表示 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-text-width mr-2"></i>生成されたプロンプト</h3>
+                <div class="mb-4">
+                    <textarea id="generated-prompt" class="w-full h-32 px-3 py-2 border rounded-lg resize-none" readonly placeholder="プロンプトがここに生成されます..."></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-copy-prompt" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-copy mr-2"></i>コピー
+                    </button>
+                    <select id="scene-select" class="px-3 py-2 border rounded-lg">
+                        <option value="1">シーン1</option>
+                        <option value="2">シーン2</option>
+                        <option value="3">シーン3</option>
+                        <option value="4">シーン4</option>
+                        <option value="5">シーン5</option>
+                        <option value="6">シーン6</option>
+                    </select>
+                    <button id="btn-save-prompt" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>シーンに保存
+                    </button>
+                </div>
+            </div>
+
+            <!-- ランダム生成コントロール（最下部に移動） -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-dice mr-2"></i>ランダム生成設定</h3>
+                <div class="flex items-center gap-4 mb-4">
+                    <button id="btn-random-all" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-random mr-2"></i>完全ランダム生成
+                    </button>
+                    <button id="btn-random-partial" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-shuffle mr-2"></i>選択項目ランダム生成
+                    </button>
+                    <button id="btn-clear-all" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-eraser mr-2"></i>全クリア
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- シーン管理タブ -->
+        <div id="content-scenes" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-film mr-2"></i>シーン管理</h3>
+                
+                <!-- シーンタブ -->
+                <div class="flex flex-wrap gap-2 mb-6" id="scene-tabs">
+                    <button class="scene-tab px-4 py-2 rounded-lg active" data-scene="1">シーン1 <span class="scene-count">(0/10)</span></button>
+                    <button class="scene-tab px-4 py-2 rounded-lg" data-scene="2">シーン2 <span class="scene-count">(0/10)</span></button>
+                    <button class="scene-tab px-4 py-2 rounded-lg" data-scene="3">シーン3 <span class="scene-count">(0/10)</span></button>
+                    <button class="scene-tab px-4 py-2 rounded-lg" data-scene="4">シーン4 <span class="scene-count">(0/10)</span></button>
+                    <button class="scene-tab px-4 py-2 rounded-lg" data-scene="5">シーン5 <span class="scene-count">(0/10)</span></button>
+                    <button class="scene-tab px-4 py-2 rounded-lg" data-scene="6">シーン6 <span class="scene-count">(0/10)</span></button>
+                </div>
+
+                <!-- シーンコンテンツ -->
+                <div id="scene-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-semibold">シーン <span id="current-scene">1</span> のプロンプト一覧</h4>
+                        <button id="btn-clear-scene" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-trash mr-2"></i>シーンクリア
+                        </button>
+                    </div>
+                    <div id="scene-prompts" class="space-y-3">
+                        <!-- プロンプトアイテムがここに表示される -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 全シーン一覧タブ -->
+        <div id="content-overview" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold"><i class="fas fa-list-alt mr-2"></i>全シーン一覧</h3>
+                    <button id="btn-copy-all" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg">
+                        <i class="fas fa-copy mr-2"></i>Wild Card用コピー
+                    </button>
+                </div>
+                <div id="all-scenes-content">
+                    <!-- 全シーンの内容がここに表示される -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // データ管理
+        let sceneData = {
+            1: [], 2: [], 3: [], 4: [], 5: [], 6: []
+        };
+
+        // 選択肢データ
+        const optionsData = {
+            people: ['1girl', '2girls', '3girls', 'harem', '1girl, 1boy'],
+            background: ['bedroom', 'bathroom', 'living room', 'kitchen', 'office', 'classroom', 'library', 'park', 'beach', 'hotel room', 'outdoors', 'car interior', 'train', 'elevator', 'rooftop'],
+            clothing: ['nude', 'topless', 'bottomless', 'panties', 'no panties', 'bra', 'skirt', 'mini skirt', 'dress', 'school uniform', 'maid outfit', 'nurse outfit', 'cosplay', 'bikini', 'lingerie', 'fishnet stockings', 'thigh highs', 'stockings', 'knee highs', 'garter belt'],
+            pose: ['standing', 'sitting', 'lying', 'legs spread', 'cowgirl position', 'doggy style', 'missionary', 'bent over', 'squatting', 'kneeling', 'all fours', 'arms up', 'hands behind head', 'touching breasts', 'masturbation'],
+            fetish: ['ahegao', 'lactation', 'pregnant', 'bukkake', 'cumshot', 'creampie', 'anal', 'double penetration', 'tentacles', 'monster', 'futanari', 'urination', 'squirting', 'interracial', 'group sex'],
+            bondage: ['bondage', 'rope bondage', 'handcuffs', 'collar', 'leash', 'chains', 'ball gag', 'blindfold', 'spreader bar', 'straitjacket', 'latex', 'leather', 'whip', 'spanking', 'cage'],
+            body: ['small breasts', 'medium breasts', 'large breasts', 'huge breasts', 'slim', 'curvy', 'thick thighs', 'wide hips'],
+            hairstyle: ['long hair', 'short hair', 'medium hair', 'twintails', 'ponytail', 'braided hair', 'bangs'],
+            haircolor: ['blonde hair', 'brown hair', 'black hair', 'red hair', 'blue hair', 'pink hair', 'purple hair', 'white hair']
+        };
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSceneData();
+            updateSceneCounts();
+            generatePrompt();
+            
+            // タブ切り替え
+            document.getElementById('tab-generate').addEventListener('click', () => showTab('generate'));
+            document.getElementById('tab-scenes').addEventListener('click', () => showTab('scenes'));
+            document.getElementById('tab-overview').addEventListener('click', () => showTab('overview'));
+
+            // プロンプト生成関連
+            document.querySelectorAll('input[type="checkbox"], input[type="number"]').forEach(input => {
+                input.addEventListener('change', generatePrompt);
+            });
+
+            // 表示切り替え
+            document.querySelectorAll('input[id^="display-"]').forEach(input => {
+                input.addEventListener('change', updateCategoryDisplay);
+            });
+
+            // ランダム生成ボタン
+            document.getElementById('btn-random-all').addEventListener('click', randomizeAll);
+            document.getElementById('btn-random-partial').addEventListener('click', randomizePartial);
+            document.getElementById('btn-clear-all').addEventListener('click', clearAll);
+
+            // コピー・保存ボタン
+            document.getElementById('btn-copy-prompt').addEventListener('click', copyPrompt);
+            document.getElementById('btn-save-prompt').addEventListener('click', savePrompt);
+            document.getElementById('btn-copy-all').addEventListener('click', copyAllScenes);
+
+            // シーン管理
+            document.querySelectorAll('.scene-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => switchScene(e.target.dataset.scene));
+            });
+            document.getElementById('btn-clear-scene').addEventListener('click', clearCurrentScene);
+
+            // 最初のシーンを表示
+            switchScene(1);
+        });
+
+        // カテゴリー表示切り替え
+        function updateCategoryDisplay() {
+            ['age', 'people', 'background', 'clothing', 'pose', 'fetish', 'bondage', 'body', 'hair'].forEach(category => {
+                const displayToggle = document.getElementById(`display-${category}`);
+                const categoryDiv = document.getElementById(`category-${category}`);
+                
+                if (displayToggle && categoryDiv) {
+                    if (displayToggle.checked) {
+                        categoryDiv.classList.remove('category-disabled');
+                    } else {
+                        categoryDiv.classList.add('category-disabled');
+                    }
+                }
+            });
+            generatePrompt();
+        }
+
+        // タブ表示切り替え
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                tab.classList.remove('bg-blue-500', 'text-white');
+                tab.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.remove('bg-gray-200', 'text-gray-700');
+            document.getElementById(`tab-${tabName}`).classList.add('bg-blue-500', 'text-white');
+
+            if (tabName === 'overview') {
+                updateOverview();
+            }
+        }
+
+        // プロンプト生成
+        function generatePrompt() {
+            const parts = [];
+            
+            // 年齢
+            const displayAge = document.getElementById('display-age').checked;
+            if (displayAge) {
+                const age = document.getElementById('age').value;
+                if (age) {
+                    parts.push(`${age}yo`);
+                }
+            }
+
+            // 各カテゴリーの選択値を取得
+            ['people', 'background', 'clothing', 'pose', 'fetish', 'bondage', 'body', 'hairstyle', 'haircolor'].forEach(category => {
+                const displayToggle = document.getElementById(`display-${category === 'hairstyle' || category === 'haircolor' ? 'hair' : category}`);
+                
+                if (displayToggle && displayToggle.checked) {
+                    const options = document.querySelectorAll(`#${category}-options input[type="checkbox"]:checked`);
+                    options.forEach(option => {
+                        parts.push(option.value);
+                    });
+                }
+            });
+
+            const prompt = parts.join(', ');
+            document.getElementById('generated-prompt').value = prompt;
+        }
+
+        // 完全ランダム生成
+        function randomizeAll() {
+            clearAll();
+            
+            // 年齢ランダム
+            document.getElementById('age').value = Math.floor(Math.random() * 20) + 18;
+
+            // 各カテゴリーをランダム選択
+            Object.keys(optionsData).forEach(category => {
+                const categoryOptions = optionsData[category];
+                const numToSelect = Math.floor(Math.random() * 3) + 1; // 1-3個選択
+                const selectedIndices = [];
+                
+                for (let i = 0; i < numToSelect; i++) {
+                    let randomIndex;
+                    do {
+                        randomIndex = Math.floor(Math.random() * categoryOptions.length);
+                    } while (selectedIndices.includes(randomIndex));
+                    selectedIndices.push(randomIndex);
+                }
+
+                const categoryDiv = document.getElementById(`${category}-options`);
+                                   
+                if (categoryDiv) {
+                    const checkboxes = categoryDiv.querySelectorAll('input[type="checkbox"]');
+                    selectedIndices.forEach(index => {
+                        if (checkboxes[index]) {
+                            checkboxes[index].checked = true;
+                        }
+                    });
+                }
+            });
+
+            generatePrompt();
+        }
+
+        // 部分ランダム生成
+        function randomizePartial() {
+            // ランダムトグルがONのカテゴリーのみランダム化
+            if (document.getElementById('random-age').checked) {
+                document.getElementById('age').value = Math.floor(Math.random() * 20) + 18;
+            }
+
+            ['people', 'background', 'clothing', 'pose', 'fetish', 'bondage', 'body', 'hair'].forEach(category => {
+                const randomToggle = document.getElementById(`random-${category}`);
+                if (randomToggle && randomToggle.checked) {
+                    // 該当カテゴリーをクリア
+                    if (category === 'hair') {
+                        // 髪型と髪色の両方をクリア
+                        ['hairstyle', 'haircolor'].forEach(subCategory => {
+                            const subCategoryDiv = document.getElementById(`${subCategory}-options`);
+                            if (subCategoryDiv) {
+                                subCategoryDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                            }
+                        });
+
+                        // 髪型と髪色の両方をランダム化
+                        ['hairstyle', 'haircolor'].forEach(subCategory => {
+                            const subOptions = optionsData[subCategory];
+                            const numToSelect = Math.floor(Math.random() * 2) + 1;
+                            
+                            for (let i = 0; i < numToSelect; i++) {
+                                const randomIndex = Math.floor(Math.random() * subOptions.length);
+                                const subCategoryDiv = document.getElementById(`${subCategory}-options`);
+                                if (subCategoryDiv) {
+                                    const checkboxes = subCategoryDiv.querySelectorAll('input[type="checkbox"]');
+                                    if (checkboxes[randomIndex]) {
+                                        checkboxes[randomIndex].checked = true;
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        const categoryDiv = document.getElementById(`${category}-options`);
+                        
+                        if (categoryDiv) {
+                            categoryDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                        }
+
+                        // ランダム選択
+                        const targetOptions = optionsData[category];
+                        if (targetOptions) {
+                            const numToSelect = Math.floor(Math.random() * 3) + 1;
+                            
+                            for (let i = 0; i < numToSelect; i++) {
+                                const randomIndex = Math.floor(Math.random() * targetOptions.length);
+                                if (categoryDiv) {
+                                    const checkboxes = categoryDiv.querySelectorAll('input[type="checkbox"]');
+                                    if (checkboxes[randomIndex]) {
+                                        checkboxes[randomIndex].checked = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            generatePrompt();
+        }
+
+        // 全クリア
+        function clearAll() {
+            document.getElementById('age').value = '';
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (!cb.id.startsWith('random-') && !cb.id.startsWith('display-')) {
+                    cb.checked = false;
+                }
+            });
+            generatePrompt();
+        }
+
+        // プロンプトコピー
+        async function copyPrompt() {
+            const prompt = document.getElementById('generated-prompt').value;
+            if (prompt) {
+                try {
+                    await navigator.clipboard.writeText(prompt);
+                    showNotification('プロンプトをコピーしました！', 'success');
+                } catch (err) {
+                    showNotification('コピーに失敗しました', 'error');
+                }
+            }
+        }
+
+        // プロンプト保存
+        function savePrompt() {
+            const prompt = document.getElementById('generated-prompt').value;
+            const sceneNum = document.getElementById('scene-select').value;
+            
+            if (prompt && sceneData[sceneNum].length < 10) {
+                sceneData[sceneNum].push({
+                    prompt: prompt,
+                    timestamp: new Date().toLocaleString()
+                });
+                saveSceneData();
+                updateSceneCounts();
+                showNotification(`シーン${sceneNum}に保存しました！`, 'success');
+            } else if (sceneData[sceneNum].length >= 10) {
+                showNotification('このシーンは満杯です（10/10）', 'warning');
+            }
+        }
+
+        // シーン切り替え
+        function switchScene(sceneNum) {
+            document.querySelectorAll('.scene-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-scene="${sceneNum}"]`).classList.add('active');
+            document.getElementById('current-scene').textContent = sceneNum;
+            
+            const scenePrompts = document.getElementById('scene-prompts');
+            scenePrompts.innerHTML = '';
+            
+            if (sceneData[sceneNum].length === 0) {
+                scenePrompts.innerHTML = '<p class="text-gray-500 text-center py-8">このシーンにはまだプロンプトが保存されていません</p>';
+            } else {
+                sceneData[sceneNum].forEach((item, index) => {
+                    const promptDiv = document.createElement('div');
+                    promptDiv.className = 'prompt-item p-4 rounded-lg';
+                    promptDiv.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 mr-4">
+                                <div class="text-sm text-gray-500 mb-2">${item.timestamp}</div>
+                                <div class="text-sm">${item.prompt}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyText('${item.prompt.replace(/'/g, "\\\'")}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button onclick="deletePrompt(${sceneNum}, ${index})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    scenePrompts.appendChild(promptDiv);
+                });
+            }
+        }
+
+        // プロンプト削除
+        function deletePrompt(sceneNum, index) {
+            sceneData[sceneNum].splice(index, 1);
+            saveSceneData();
+            updateSceneCounts();
+            switchScene(sceneNum);
+            showNotification('プロンプトを削除しました', 'success');
+        }
+
+        // シーンクリア
+        function clearCurrentScene() {
+            const currentScene = document.getElementById('current-scene').textContent;
+            if (confirm(`シーン${currentScene}の全プロンプトを削除しますか？`)) {
+                sceneData[currentScene] = [];
+                saveSceneData();
+                updateSceneCounts();
+                switchScene(currentScene);
+                showNotification(`シーン${currentScene}をクリアしました`, 'success');
+            }
+        }
+
+        // シーン数更新
+        function updateSceneCounts() {
+            document.querySelectorAll('.scene-tab').forEach(tab => {
+                const sceneNum = tab.dataset.scene;
+                const count = sceneData[sceneNum].length;
+                tab.querySelector('.scene-count').textContent = `(${count}/10)`;
+            });
+        }
+
+        // 全シーン一覧更新
+        function updateOverview() {
+            const container = document.getElementById('all-scenes-content');
+            container.innerHTML = '';
+            
+            let hasContent = false;
+            
+            for (let i = 1; i <= 6; i++) {
+                if (sceneData[i].length > 0) {
+                    hasContent = true;
+                    const sceneDiv = document.createElement('div');
+                    sceneDiv.className = 'mb-8 p-6 bg-gray-50 rounded-lg';
+                    sceneDiv.innerHTML = `
+                        <h4 class="text-lg font-bold mb-4 text-blue-600">
+                            <i class="fas fa-film mr-2"></i>シーン${i} (${sceneData[i].length}個のプロンプト)
+                        </h4>
+                        <div class="space-y-3">
+                            ${sceneData[i].map((item, index) => `
+                                <div class="bg-white p-4 rounded border-l-4 border-blue-500">
+                                    <div class="text-xs text-gray-500 mb-2">${item.timestamp}</div>
+                                    <div class="text-sm">${item.prompt}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(sceneDiv);
+                }
+            }
+            
+            if (!hasContent) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">まだプロンプトが保存されていません</p>';
+            }
+        }
+
+        // 全シーンコピー (Wild card用)
+        async function copyAllScenes() {
+            let allPrompts = [];
+            
+            for (let i = 1; i <= 6; i++) {
+                if (sceneData[i].length > 0) {
+                    sceneData[i].forEach((item) => {
+                        allPrompts.push(item.prompt);
+                    });
+                }
+            }
+            
+            if (allPrompts.length > 0) {
+                const wildCardText = allPrompts.join('\n');
+                try {
+                    await navigator.clipboard.writeText(wildCardText);
+                    showNotification('Wild card用プロンプトをコピーしました！', 'success');
+                } catch (err) {
+                    showNotification('コピーに失敗しました', 'error');
+                }
+            } else {
+                showNotification('コピーするプロンプトがありません', 'warning');
+            }
+        }
+
+        // テキストコピー汎用関数
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showNotification('コピーしました！', 'success');
+            } catch (err) {
+                showNotification('コピーに失敗しました', 'error');
+            }
+        }
+
+        // データ保存
+        function saveSceneData() {
+            localStorage.setItem('aiPromptSceneData', JSON.stringify(sceneData));
+        }
+
+        // データ読み込み
+        function loadSceneData() {
+            const saved = localStorage.getItem('aiPromptSceneData');
+            if (saved) {
+                sceneData = JSON.parse(saved);
+            }
+        }
+
+        // 通知表示
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDsFfINMdoULzQbsJ6idMpaJ2tXzJsuumlkOjGsQroffNZiPZjoEdJpxRC0zAMfsUBpYEKxrelkfwsfHnQkFWBnui7CQuXy%2BPoymEHUbtfs4vLxG%2FOux37hiJxZsL52AuLsiLQierVts5SBp4GE%2BWxZsa9RJmqm90MnI1GJFKOvinSoOaRVu14CcfTs%2B%2FwYdFFEVtJAVZ8W2nrQN9Cl8wdy3dKXMSsVKw3VRW%2B67sOV%2FTwABDN09Frrnb%2FUTKNcFq2y0l%2BukhGfHVwHRfQMrxwnbhTf4gvZd78e3tv2f6PxDqrJdMZVBI2RVB%2BUDVyCZrRee%2Bgae3X7ABpYEtOY1H1QDflev0yHA37pv%2BDbm7vWylYaHh02E005ilzxn0LaJIlGuPPlTDTuHLskULTJL0B%2BeH4UniV2HUgMdtKj0GtwRbT5IxbfcCDSGPtyvhNs4WAia7nLj8Y%2B3tWuGAmcYwxCn%2FQSprdjlxUO4PYG9kEh35OM%2BWStVv%2F8qq1drKQN%2F0Lg%3D%3D";
+        window.__genspark_locale = "ja-JP";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDsFfINMdoULzQbsJ6idMpaJ2tXzJsuumlkOjGsQroffNZiPZjoEdJpxRC0zAMfsUBpYEKxrelkfwsfHnQkFWBnui7CQuXy+PoymEHUbtfs4vLxG/Oux37hiJxZsL52AuLsiLQierVts5SBp4GE+WxZsa9RJmqm90MnI1GJFKOvinSoOaRVu14CcfTs+/wYdFFEVtJAVZ8W2nrQN9Cl8wdy3dKXMSsVKw3VRW+67sOV/TwABDN09Frrnb/UTKNcFq2y0l+ukhGfHVwHRfQMrxwnbhTf4gvZd78e3tv2f6PxDqrJdMZVBI2RVB+UDVyCZrRee+gae3X7ABpYEtOY1H1QDflev0yHA37pv+Dbm7vWylYaHh02E005ilzxn0LaJIlGuPPlTDTuHLskULTJL0B+eH4UniV2HUgMdtKj0GtwRbT5IxbfcCDSGPtyvhNs4WAia7nLj8Y+3tWuGAmcYwxCn/QSprdjlxUO4PYG9kEh35OM+WStVv/8qq1drKQN/0Lg==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
