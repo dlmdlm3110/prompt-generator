@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIプロンプト生成・管理ツール - プロ版（改良）</title>
+    <title>AIプロンプト生成・管理ツール - 最終完成版</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -75,7 +75,7 @@
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
-            <i class="fas fa-magic mr-3"></i>AIプロンプト生成・管理ツール - プロ版
+            <i class="fas fa-magic mr-3"></i>AIプロンプト生成・管理ツール - 最終完成版
         </h1>
 
         <!-- メインタブ -->
@@ -95,7 +95,68 @@
 
         <!-- プロンプト生成タブ -->
         <div id="content-generate" class="tab-content">
-            <!-- 年齢設定 -->
+            <!-- 生成されたプロンプト表示 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-text-width mr-2"></i>生成されたプロンプト</h3>
+                <div class="mb-4">
+                    <textarea id="generated-prompt" class="w-full h-32 px-3 py-2 border rounded-lg resize-none" readonly placeholder="プロンプトがここに生成されます..."></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-copy-prompt" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-copy mr-2"></i>コピー
+                    </button>
+                    <select id="scene-select" class="px-3 py-2 border rounded-lg">
+                        <option value="1">シーン1</option>
+                        <option value="2">シーン2</option>
+                        <option value="3">シーン3</option>
+                        <option value="4">シーン4</option>
+                        <option value="5">シーン5</option>
+                        <option value="6">シーン6</option>
+                    </select>
+                    <button id="btn-save-prompt" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>シーンに保存
+                    </button>
+                </div>
+            </div>
+
+            <!-- 1. Scoreタグ設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-score">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-star mr-2"></i>Scoreタグ（品質向上）</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-score" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-score">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="score-options">
+                    <label class="flex items-center"><input type="checkbox" value="score_9" class="mr-2">score_9</label>
+                    <label class="flex items-center"><input type="checkbox" value="score_8_up" class="mr-2">score_8_up</label>
+                    <label class="flex items-center"><input type="checkbox" value="score_7_up" class="mr-2">score_7_up</label>
+                    <label class="flex items-center"><input type="checkbox" value="best quality" class="mr-2">best quality</label>
+                    <label class="flex items-center"><input type="checkbox" value="masterpiece" class="mr-2">masterpiece</label>
+                    <label class="flex items-center"><input type="checkbox" value="highly detailed" class="mr-2">highly detailed</label>
+                    <label class="flex items-center"><input type="checkbox" value="high resolution" class="mr-2">high resolution</label>
+                    <label class="flex items-center"><input type="checkbox" value="ultra detailed" class="mr-2">ultra detailed</label>
+                    <label class="flex items-center"><input type="checkbox" value="perfect anatomy" class="mr-2">perfect anatomy</label>
+                    <label class="flex items-center"><input type="checkbox" value="detailed face" class="mr-2">detailed face</label>
+                    <label class="flex items-center"><input type="checkbox" value="beautiful eyes" class="mr-2">beautiful eyes</label>
+                    <label class="flex items-center"><input type="checkbox" value="sharp focus" class="mr-2">sharp focus</label>
+                </div>
+            </div>
+
+            <!-- 2. 年齢設定 -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-age">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold"><i class="fas fa-user mr-2"></i>年齢</h3>
@@ -119,7 +180,7 @@
                 <input type="number" id="age" class="w-full px-3 py-2 border rounded-lg" min="18" max="99" value="22" placeholder="年齢を入力">
             </div>
 
-            <!-- 人数設定 -->
+            <!-- 3. 人数設定 -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-people">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold"><i class="fas fa-users mr-2"></i>人数</h3>
@@ -149,245 +210,7 @@
                 </div>
             </div>
 
-            <!-- 背景設定 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-background">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold"><i class="fas fa-image mr-2"></i>背景</h3>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">表示</span>
-                            <label class="display-toggle">
-                                <input type="checkbox" id="display-background" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">ランダム</span>
-                            <label class="random-toggle">
-                                <input type="checkbox" id="random-background">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox-group" id="background-options">
-                    <label class="flex items-center"><input type="checkbox" value="bedroom" class="mr-2">寝室</label>
-                    <label class="flex items-center"><input type="checkbox" value="bathroom" class="mr-2">浴室</label>
-                    <label class="flex items-center"><input type="checkbox" value="living room" class="mr-2">リビング</label>
-                    <label class="flex items-center"><input type="checkbox" value="kitchen" class="mr-2">キッチン</label>
-                    <label class="flex items-center"><input type="checkbox" value="office" class="mr-2">オフィス</label>
-                    <label class="flex items-center"><input type="checkbox" value="classroom" class="mr-2">教室</label>
-                    <label class="flex items-center"><input type="checkbox" value="library" class="mr-2">図書館</label>
-                    <label class="flex items-center"><input type="checkbox" value="park" class="mr-2">公園</label>
-                    <label class="flex items-center"><input type="checkbox" value="beach" class="mr-2">ビーチ</label>
-                    <label class="flex items-center"><input type="checkbox" value="hotel room" class="mr-2">ホテル</label>
-                    <label class="flex items-center"><input type="checkbox" value="outdoors" class="mr-2">屋外</label>
-                    <label class="flex items-center"><input type="checkbox" value="car interior" class="mr-2">車内</label>
-                    <label class="flex items-center"><input type="checkbox" value="train" class="mr-2">電車</label>
-                    <label class="flex items-center"><input type="checkbox" value="elevator" class="mr-2">エレベーター</label>
-                    <label class="flex items-center"><input type="checkbox" value="rooftop" class="mr-2">屋上</label>
-                </div>
-            </div>
-
-            <!-- 服装設定 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-clothing">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold"><i class="fas fa-tshirt mr-2"></i>服装</h3>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">表示</span>
-                            <label class="display-toggle">
-                                <input type="checkbox" id="display-clothing" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">ランダム</span>
-                            <label class="random-toggle">
-                                <input type="checkbox" id="random-clothing">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox-group" id="clothing-options">
-                    <label class="flex items-center"><input type="checkbox" value="nude" class="mr-2">裸・ヌード</label>
-                    <label class="flex items-center"><input type="checkbox" value="topless" class="mr-2">トップレス</label>
-                    <label class="flex items-center"><input type="checkbox" value="bottomless" class="mr-2">ボトムレス</label>
-                    <label class="flex items-center"><input type="checkbox" value="panties" class="mr-2">パンツ</label>
-                    <label class="flex items-center"><input type="checkbox" value="no panties" class="mr-2">ノーパン</label>
-                    <label class="flex items-center"><input type="checkbox" value="bra" class="mr-2">ブラジャー</label>
-                    <label class="flex items-center"><input type="checkbox" value="skirt" class="mr-2">スカート</label>
-                    <label class="flex items-center"><input type="checkbox" value="mini skirt" class="mr-2">ミニスカート</label>
-                    <label class="flex items-center"><input type="checkbox" value="dress" class="mr-2">ドレス</label>
-                    <label class="flex items-center"><input type="checkbox" value="school uniform" class="mr-2">制服・学生服</label>
-                    <label class="flex items-center"><input type="checkbox" value="maid outfit" class="mr-2">メイド服</label>
-                    <label class="flex items-center"><input type="checkbox" value="nurse outfit" class="mr-2">ナース服</label>
-                    <label class="flex items-center"><input type="checkbox" value="cosplay" class="mr-2">コスプレ</label>
-                    <label class="flex items-center"><input type="checkbox" value="bikini" class="mr-2">ビキニ</label>
-                    <label class="flex items-center"><input type="checkbox" value="lingerie" class="mr-2">ランジェリー</label>
-                    <label class="flex items-center"><input type="checkbox" value="fishnet stockings" class="mr-2">網タイツ</label>
-                    <label class="flex items-center"><input type="checkbox" value="thigh highs" class="mr-2">ニーハイ</label>
-                    <label class="flex items-center"><input type="checkbox" value="stockings" class="mr-2">ストッキング</label>
-                    <label class="flex items-center"><input type="checkbox" value="knee highs" class="mr-2">ミドルニーソックス</label>
-                    <label class="flex items-center"><input type="checkbox" value="garter belt" class="mr-2">ガーターベルト</label>
-                </div>
-            </div>
-
-            <!-- ポーズ設定 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-pose">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold"><i class="fas fa-running mr-2"></i>ポーズ</h3>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">表示</span>
-                            <label class="display-toggle">
-                                <input type="checkbox" id="display-pose" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">ランダム</span>
-                            <label class="random-toggle">
-                                <input type="checkbox" id="random-pose">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox-group" id="pose-options">
-                    <label class="flex items-center"><input type="checkbox" value="standing" class="mr-2">立っている</label>
-                    <label class="flex items-center"><input type="checkbox" value="sitting" class="mr-2">座っている</label>
-                    <label class="flex items-center"><input type="checkbox" value="lying" class="mr-2">横になっている</label>
-                    <label class="flex items-center"><input type="checkbox" value="legs spread" class="mr-2">開脚</label>
-                    <label class="flex items-center"><input type="checkbox" value="cowgirl position" class="mr-2">騎乗位</label>
-                    <label class="flex items-center"><input type="checkbox" value="doggy style" class="mr-2">後背位</label>
-                    <label class="flex items-center"><input type="checkbox" value="missionary" class="mr-2">正常位</label>
-                    <label class="flex items-center"><input type="checkbox" value="bent over" class="mr-2">かがんでいる</label>
-                    <label class="flex items-center"><input type="checkbox" value="squatting" class="mr-2">しゃがんでいる</label>
-                    <label class="flex items-center"><input type="checkbox" value="kneeling" class="mr-2">膝をついている</label>
-                    <label class="flex items-center"><input type="checkbox" value="all fours" class="mr-2">四つん這い</label>
-                    <label class="flex items-center"><input type="checkbox" value="arms up" class="mr-2">両手を上げている</label>
-                    <label class="flex items-center"><input type="checkbox" value="hands behind head" class="mr-2">頭の後ろに手を回している</label>
-                    <label class="flex items-center"><input type="checkbox" value="touching breasts" class="mr-2">胸を触っている</label>
-                    <label class="flex items-center"><input type="checkbox" value="masturbation" class="mr-2">自慰行為</label>
-                </div>
-            </div>
-
-            <!-- フェチ設定 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-fetish">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold"><i class="fas fa-heart mr-2"></i>フェチ</h3>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">表示</span>
-                            <label class="display-toggle">
-                                <input type="checkbox" id="display-fetish" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">ランダム</span>
-                            <label class="random-toggle">
-                                <input type="checkbox" id="random-fetish">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox-group" id="fetish-options">
-                    <label class="flex items-center"><input type="checkbox" value="ahegao" class="mr-2">アヘ顔</label>
-                    <label class="flex items-center"><input type="checkbox" value="lactation" class="mr-2">母乳</label>
-                    <label class="flex items-center"><input type="checkbox" value="pregnant" class="mr-2">妊娠</label>
-                    <label class="flex items-center"><input type="checkbox" value="bukkake" class="mr-2">ぶっかけ</label>
-                    <label class="flex items-center"><input type="checkbox" value="cumshot" class="mr-2">射精</label>
-                    <label class="flex items-center"><input type="checkbox" value="creampie" class="mr-2">中出し</label>
-                    <label class="flex items-center"><input type="checkbox" value="anal" class="mr-2">アナル</label>
-                    <label class="flex items-center"><input type="checkbox" value="double penetration" class="mr-2">二穴責め</label>
-                    <label class="flex items-center"><input type="checkbox" value="tentacles" class="mr-2">触手</label>
-                    <label class="flex items-center"><input type="checkbox" value="monster" class="mr-2">モンスター</label>
-                    <label class="flex items-center"><input type="checkbox" value="futanari" class="mr-2">ふたなり</label>
-                    <label class="flex items-center"><input type="checkbox" value="urination" class="mr-2">放尿</label>
-                    <label class="flex items-center"><input type="checkbox" value="squirting" class="mr-2">潮吹き</label>
-                    <label class="flex items-center"><input type="checkbox" value="interracial" class="mr-2">異人種間</label>
-                    <label class="flex items-center"><input type="checkbox" value="group sex" class="mr-2">乱交</label>
-                </div>
-            </div>
-
-            <!-- SM・拘束設定 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-bondage">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold"><i class="fas fa-link mr-2"></i>SM・拘束</h3>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">表示</span>
-                            <label class="display-toggle">
-                                <input type="checkbox" id="display-bondage" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">ランダム</span>
-                            <label class="random-toggle">
-                                <input type="checkbox" id="random-bondage">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox-group" id="bondage-options">
-                    <label class="flex items-center"><input type="checkbox" value="bondage" class="mr-2">拘束</label>
-                    <label class="flex items-center"><input type="checkbox" value="rope bondage" class="mr-2">縄縛り</label>
-                    <label class="flex items-center"><input type="checkbox" value="handcuffs" class="mr-2">手錠</label>
-                    <label class="flex items-center"><input type="checkbox" value="collar" class="mr-2">首輪</label>
-                    <label class="flex items-center"><input type="checkbox" value="leash" class="mr-2">リード</label>
-                    <label class="flex items-center"><input type="checkbox" value="chains" class="mr-2">鎖</label>
-                    <label class="flex items-center"><input type="checkbox" value="ball gag" class="mr-2">ボールギャグ</label>
-                    <label class="flex items-center"><input type="checkbox" value="blindfold" class="mr-2">目隠し</label>
-                    <label class="flex items-center"><input type="checkbox" value="spreader bar" class="mr-2">開脚器</label>
-                    <label class="flex items-center"><input type="checkbox" value="straitjacket" class="mr-2">拘束衣</label>
-                    <label class="flex items-center"><input type="checkbox" value="latex" class="mr-2">ラテックス</label>
-                    <label class="flex items-center"><input type="checkbox" value="leather" class="mr-2">レザー</label>
-                    <label class="flex items-center"><input type="checkbox" value="whip" class="mr-2">鞭</label>
-                    <label class="flex items-center"><input type="checkbox" value="spanking" class="mr-2">スパンキング</label>
-                    <label class="flex items-center"><input type="checkbox" value="cage" class="mr-2">檻</label>
-                </div>
-            </div>
-
-            <!-- 体型設定 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-body">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold"><i class="fas fa-female mr-2"></i>体型</h3>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">表示</span>
-                            <label class="display-toggle">
-                                <input type="checkbox" id="display-body" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm">ランダム</span>
-                            <label class="random-toggle">
-                                <input type="checkbox" id="random-body">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox-group" id="body-options">
-                    <label class="flex items-center"><input type="checkbox" value="small breasts" class="mr-2">小さい胸</label>
-                    <label class="flex items-center"><input type="checkbox" value="medium breasts" class="mr-2">普通の胸</label>
-                    <label class="flex items-center"><input type="checkbox" value="large breasts" class="mr-2">大きい胸</label>
-                    <label class="flex items-center"><input type="checkbox" value="huge breasts" class="mr-2">巨乳</label>
-                    <label class="flex items-center"><input type="checkbox" value="slim" class="mr-2">スリム</label>
-                    <label class="flex items-center"><input type="checkbox" value="curvy" class="mr-2">グラマラス</label>
-                    <label class="flex items-center"><input type="checkbox" value="thick thighs" class="mr-2">太い太もも</label>
-                    <label class="flex items-center"><input type="checkbox" value="wide hips" class="mr-2">広い腰</label>
-                </div>
-            </div>
-
-            <!-- 髪型・髪色設定 -->
+            <!-- 4. 髪型・髪色設定 -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-hair">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold"><i class="fas fa-cut mr-2"></i>髪型・髪色</h3>
@@ -437,31 +260,325 @@
                 </div>
             </div>
 
-            <!-- 生成されたプロンプト表示 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h3 class="text-xl font-bold mb-4"><i class="fas fa-text-width mr-2"></i>生成されたプロンプト</h3>
-                <div class="mb-4">
-                    <textarea id="generated-prompt" class="w-full h-32 px-3 py-2 border rounded-lg resize-none" readonly placeholder="プロンプトがここに生成されます..."></textarea>
+            <!-- 5. 表情設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-expression">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-smile mr-2"></i>表情</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-expression" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-expression">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <button id="btn-copy-prompt" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-copy mr-2"></i>コピー
-                    </button>
-                    <select id="scene-select" class="px-3 py-2 border rounded-lg">
-                        <option value="1">シーン1</option>
-                        <option value="2">シーン2</option>
-                        <option value="3">シーン3</option>
-                        <option value="4">シーン4</option>
-                        <option value="5">シーン5</option>
-                        <option value="6">シーン6</option>
-                    </select>
-                    <button id="btn-save-prompt" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-save mr-2"></i>シーンに保存
-                    </button>
+                <div class="checkbox-group" id="expression-options">
+                    <label class="flex items-center"><input type="checkbox" value="smile" class="mr-2">笑顔</label>
+                    <label class="flex items-center"><input type="checkbox" value="seductive smile" class="mr-2">誘惑的な笑み</label>
+                    <label class="flex items-center"><input type="checkbox" value="innocent" class="mr-2">無邪気</label>
+                    <label class="flex items-center"><input type="checkbox" value="shy" class="mr-2">恥ずかしがり</label>
+                    <label class="flex items-center"><input type="checkbox" value="blushing" class="mr-2">赤面</label>
+                    <label class="flex items-center"><input type="checkbox" value="crying" class="mr-2">泣いている</label>
+                    <label class="flex items-center"><input type="checkbox" value="angry" class="mr-2">怒っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="surprised" class="mr-2">驚いている</label>
+                    <label class="flex items-center"><input type="checkbox" value="serious" class="mr-2">真剣</label>
+                    <label class="flex items-center"><input type="checkbox" value="sleepy" class="mr-2">眠そう</label>
+                    <label class="flex items-center"><input type="checkbox" value="winking" class="mr-2">ウィンク</label>
+                    <label class="flex items-center"><input type="checkbox" value="tongue out" class="mr-2">舌を出している</label>
+                    <label class="flex items-center"><input type="checkbox" value="pouting" class="mr-2">ふくれている</label>
+                    <label class="flex items-center"><input type="checkbox" value="lustful" class="mr-2">欲情的</label>
+                    <label class="flex items-center"><input type="checkbox" value="orgasm face" class="mr-2">絶頂表情</label>
                 </div>
             </div>
 
-            <!-- ランダム生成コントロール（最下部に移動） -->
+            <!-- 6. 体型設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-body">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-female mr-2"></i>体型</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-body" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-body">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="body-options">
+                    <label class="flex items-center"><input type="checkbox" value="small breasts" class="mr-2">小さい胸</label>
+                    <label class="flex items-center"><input type="checkbox" value="medium breasts" class="mr-2">普通の胸</label>
+                    <label class="flex items-center"><input type="checkbox" value="large breasts" class="mr-2">大きい胸</label>
+                    <label class="flex items-center"><input type="checkbox" value="huge breasts" class="mr-2">巨乳</label>
+                    <label class="flex items-center"><input type="checkbox" value="slim" class="mr-2">スリム</label>
+                    <label class="flex items-center"><input type="checkbox" value="curvy" class="mr-2">グラマラス</label>
+                    <label class="flex items-center"><input type="checkbox" value="thick thighs" class="mr-2">太い太もも</label>
+                    <label class="flex items-center"><input type="checkbox" value="wide hips" class="mr-2">広い腰</label>
+                </div>
+            </div>
+
+            <!-- 7. 服装設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-clothing">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-tshirt mr-2"></i>服装</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-clothing" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-clothing">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="clothing-options">
+                    <label class="flex items-center"><input type="checkbox" value="nude" class="mr-2">裸・ヌード</label>
+                    <label class="flex items-center"><input type="checkbox" value="topless" class="mr-2">トップレス</label>
+                    <label class="flex items-center"><input type="checkbox" value="bottomless" class="mr-2">ボトムレス</label>
+                    <label class="flex items-center"><input type="checkbox" value="panties" class="mr-2">パンツ</label>
+                    <label class="flex items-center"><input type="checkbox" value="no panties" class="mr-2">ノーパン</label>
+                    <label class="flex items-center"><input type="checkbox" value="bra" class="mr-2">ブラジャー</label>
+                    <label class="flex items-center"><input type="checkbox" value="skirt" class="mr-2">スカート</label>
+                    <label class="flex items-center"><input type="checkbox" value="mini skirt" class="mr-2">ミニスカート</label>
+                    <label class="flex items-center"><input type="checkbox" value="dress" class="mr-2">ドレス</label>
+                    <label class="flex items-center"><input type="checkbox" value="school uniform" class="mr-2">制服・学生服</label>
+                    <label class="flex items-center"><input type="checkbox" value="maid outfit" class="mr-2">メイド服</label>
+                    <label class="flex items-center"><input type="checkbox" value="nurse outfit" class="mr-2">ナース服</label>
+                    <label class="flex items-center"><input type="checkbox" value="cosplay" class="mr-2">コスプレ</label>
+                    <label class="flex items-center"><input type="checkbox" value="bikini" class="mr-2">ビキニ</label>
+                    <label class="flex items-center"><input type="checkbox" value="lingerie" class="mr-2">ランジェリー</label>
+                    <label class="flex items-center"><input type="checkbox" value="fishnet stockings" class="mr-2">網タイツ</label>
+                    <label class="flex items-center"><input type="checkbox" value="thigh highs" class="mr-2">ニーハイ</label>
+                    <label class="flex items-center"><input type="checkbox" value="stockings" class="mr-2">ストッキング</label>
+                    <label class="flex items-center"><input type="checkbox" value="knee highs" class="mr-2">ミドルニーソックス</label>
+                    <label class="flex items-center"><input type="checkbox" value="garter belt" class="mr-2">ガーターベルト</label>
+                </div>
+            </div>
+
+            <!-- 8. ポーズ設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-pose">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-running mr-2"></i>ポーズ</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-pose" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-pose">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="pose-options">
+                    <label class="flex items-center"><input type="checkbox" value="standing" class="mr-2">立っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="sitting" class="mr-2">座っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="lying" class="mr-2">横になっている</label>
+                    <label class="flex items-center"><input type="checkbox" value="legs spread" class="mr-2">開脚</label>
+                    <label class="flex items-center"><input type="checkbox" value="cowgirl position" class="mr-2">騎乗位</label>
+                    <label class="flex items-center"><input type="checkbox" value="doggy style" class="mr-2">後背位</label>
+                    <label class="flex items-center"><input type="checkbox" value="missionary" class="mr-2">正常位</label>
+                    <label class="flex items-center"><input type="checkbox" value="bent over" class="mr-2">かがんでいる</label>
+                    <label class="flex items-center"><input type="checkbox" value="squatting" class="mr-2">しゃがんでいる</label>
+                    <label class="flex items-center"><input type="checkbox" value="kneeling" class="mr-2">膝をついている</label>
+                    <label class="flex items-center"><input type="checkbox" value="all fours" class="mr-2">四つん這い</label>
+                    <label class="flex items-center"><input type="checkbox" value="arms up" class="mr-2">両手を上げている</label>
+                    <label class="flex items-center"><input type="checkbox" value="hands behind head" class="mr-2">頭の後ろに手を回している</label>
+                    <label class="flex items-center"><input type="checkbox" value="touching breasts" class="mr-2">胸を触っている</label>
+                    <label class="flex items-center"><input type="checkbox" value="masturbation" class="mr-2">自慰行為</label>
+                </div>
+            </div>
+
+            <!-- 9. フェチ設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-fetish">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-heart mr-2"></i>フェチ</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-fetish" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-fetish">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="fetish-options">
+                    <label class="flex items-center"><input type="checkbox" value="ahegao" class="mr-2">アヘ顔</label>
+                    <label class="flex items-center"><input type="checkbox" value="lactation" class="mr-2">母乳</label>
+                    <label class="flex items-center"><input type="checkbox" value="pregnant" class="mr-2">妊娠</label>
+                    <label class="flex items-center"><input type="checkbox" value="bukkake" class="mr-2">ぶっかけ</label>
+                    <label class="flex items-center"><input type="checkbox" value="cumshot" class="mr-2">射精</label>
+                    <label class="flex items-center"><input type="checkbox" value="creampie" class="mr-2">中出し</label>
+                    <label class="flex items-center"><input type="checkbox" value="anal" class="mr-2">アナル</label>
+                    <label class="flex items-center"><input type="checkbox" value="double penetration" class="mr-2">二穴責め</label>
+                    <label class="flex items-center"><input type="checkbox" value="tentacles" class="mr-2">触手</label>
+                    <label class="flex items-center"><input type="checkbox" value="monster" class="mr-2">モンスター</label>
+                    <label class="flex items-center"><input type="checkbox" value="futanari" class="mr-2">ふたなり</label>
+                    <label class="flex items-center"><input type="checkbox" value="urination" class="mr-2">放尿</label>
+                    <label class="flex items-center"><input type="checkbox" value="squirting" class="mr-2">潮吹き</label>
+                    <label class="flex items-center"><input type="checkbox" value="interracial" class="mr-2">異人種間</label>
+                    <label class="flex items-center"><input type="checkbox" value="group sex" class="mr-2">乱交</label>
+                </div>
+            </div>
+
+            <!-- 10. SM・拘束設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-bondage">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-link mr-2"></i>SM・拘束</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-bondage" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-bondage">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="bondage-options">
+                    <label class="flex items-center"><input type="checkbox" value="bondage" class="mr-2">拘束</label>
+                    <label class="flex items-center"><input type="checkbox" value="rope bondage" class="mr-2">縄縛り</label>
+                    <label class="flex items-center"><input type="checkbox" value="handcuffs" class="mr-2">手錠</label>
+                    <label class="flex items-center"><input type="checkbox" value="collar" class="mr-2">首輪</label>
+                    <label class="flex items-center"><input type="checkbox" value="leash" class="mr-2">リード</label>
+                    <label class="flex items-center"><input type="checkbox" value="chains" class="mr-2">鎖</label>
+                    <label class="flex items-center"><input type="checkbox" value="ball gag" class="mr-2">ボールギャグ</label>
+                    <label class="flex items-center"><input type="checkbox" value="blindfold" class="mr-2">目隠し</label>
+                    <label class="flex items-center"><input type="checkbox" value="spreader bar" class="mr-2">開脚器</label>
+                    <label class="flex items-center"><input type="checkbox" value="straitjacket" class="mr-2">拘束衣</label>
+                    <label class="flex items-center"><input type="checkbox" value="latex" class="mr-2">ラテックス</label>
+                    <label class="flex items-center"><input type="checkbox" value="leather" class="mr-2">レザー</label>
+                    <label class="flex items-center"><input type="checkbox" value="whip" class="mr-2">鞭</label>
+                    <label class="flex items-center"><input type="checkbox" value="spanking" class="mr-2">スパンキング</label>
+                    <label class="flex items-center"><input type="checkbox" value="cage" class="mr-2">檻</label>
+                </div>
+            </div>
+
+            <!-- 11. アングル設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-angle">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-camera mr-2"></i>アングル</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-angle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-angle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="angle-options">
+                    <label class="flex items-center"><input type="checkbox" value="close-up" class="mr-2">クローズアップ</label>
+                    <label class="flex items-center"><input type="checkbox" value="medium shot" class="mr-2">ミディアムショット</label>
+                    <label class="flex items-center"><input type="checkbox" value="full body" class="mr-2">全身</label>
+                    <label class="flex items-center"><input type="checkbox" value="from above" class="mr-2">上から</label>
+                    <label class="flex items-center"><input type="checkbox" value="from below" class="mr-2">下から</label>
+                    <label class="flex items-center"><input type="checkbox" value="side view" class="mr-2">横から</label>
+                    <label class="flex items-center"><input type="checkbox" value="back view" class="mr-2">後ろから</label>
+                    <label class="flex items-center"><input type="checkbox" value="three-quarter view" class="mr-2">斜めから</label>
+                    <label class="flex items-center"><input type="checkbox" value="first person view" class="mr-2">一人称視点</label>
+                    <label class="flex items-center"><input type="checkbox" value="POV" class="mr-2">POV</label>
+                    <label class="flex items-center"><input type="checkbox" value="overhead view" class="mr-2">真上から</label>
+                    <label class="flex items-center"><input type="checkbox" value="dutch angle" class="mr-2">ダッチアングル</label>
+                    <label class="flex items-center"><input type="checkbox" value="wide shot" class="mr-2">ワイドショット</label>
+                    <label class="flex items-center"><input type="checkbox" value="macro shot" class="mr-2">マクロショット</label>
+                    <label class="flex items-center"><input type="checkbox" value="extreme close-up" class="mr-2">超クローズアップ</label>
+                </div>
+            </div>
+
+            <!-- 12. 背景設定 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-background">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-image mr-2"></i>背景</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">表示</span>
+                            <label class="display-toggle">
+                                <input type="checkbox" id="display-background" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">ランダム</span>
+                            <label class="random-toggle">
+                                <input type="checkbox" id="random-background">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox-group" id="background-options">
+                    <label class="flex items-center"><input type="checkbox" value="bedroom" class="mr-2">寝室</label>
+                    <label class="flex items-center"><input type="checkbox" value="bathroom" class="mr-2">浴室</label>
+                    <label class="flex items-center"><input type="checkbox" value="living room" class="mr-2">リビング</label>
+                    <label class="flex items-center"><input type="checkbox" value="kitchen" class="mr-2">キッチン</label>
+                    <label class="flex items-center"><input type="checkbox" value="office" class="mr-2">オフィス</label>
+                    <label class="flex items-center"><input type="checkbox" value="classroom" class="mr-2">教室</label>
+                    <label class="flex items-center"><input type="checkbox" value="library" class="mr-2">図書館</label>
+                    <label class="flex items-center"><input type="checkbox" value="park" class="mr-2">公園</label>
+                    <label class="flex items-center"><input type="checkbox" value="beach" class="mr-2">ビーチ</label>
+                    <label class="flex items-center"><input type="checkbox" value="hotel room" class="mr-2">ホテル</label>
+                    <label class="flex items-center"><input type="checkbox" value="outdoors" class="mr-2">屋外</label>
+                    <label class="flex items-center"><input type="checkbox" value="car interior" class="mr-2">車内</label>
+                    <label class="flex items-center"><input type="checkbox" value="train" class="mr-2">電車</label>
+                    <label class="flex items-center"><input type="checkbox" value="elevator" class="mr-2">エレベーター</label>
+                    <label class="flex items-center"><input type="checkbox" value="rooftop" class="mr-2">屋上</label>
+                </div>
+            </div>
+
+            <!-- ランダム生成コントロール（最下部） -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <h3 class="text-xl font-bold mb-4"><i class="fas fa-dice mr-2"></i>ランダム生成設定</h3>
                 <div class="flex items-center gap-4 mb-4">
@@ -532,13 +649,16 @@
 
         // 選択肢データ
         const optionsData = {
+            score: ['score_9', 'score_8_up', 'score_7_up', 'best quality', 'masterpiece', 'highly detailed', 'high resolution', 'ultra detailed', 'perfect anatomy', 'detailed face', 'beautiful eyes', 'sharp focus'],
             people: ['1girl', '2girls', '3girls', 'harem', '1girl, 1boy'],
-            background: ['bedroom', 'bathroom', 'living room', 'kitchen', 'office', 'classroom', 'library', 'park', 'beach', 'hotel room', 'outdoors', 'car interior', 'train', 'elevator', 'rooftop'],
+            expression: ['smile', 'seductive smile', 'innocent', 'shy', 'blushing', 'crying', 'angry', 'surprised', 'serious', 'sleepy', 'winking', 'tongue out', 'pouting', 'lustful', 'orgasm face'],
+            body: ['small breasts', 'medium breasts', 'large breasts', 'huge breasts', 'slim', 'curvy', 'thick thighs', 'wide hips'],
             clothing: ['nude', 'topless', 'bottomless', 'panties', 'no panties', 'bra', 'skirt', 'mini skirt', 'dress', 'school uniform', 'maid outfit', 'nurse outfit', 'cosplay', 'bikini', 'lingerie', 'fishnet stockings', 'thigh highs', 'stockings', 'knee highs', 'garter belt'],
             pose: ['standing', 'sitting', 'lying', 'legs spread', 'cowgirl position', 'doggy style', 'missionary', 'bent over', 'squatting', 'kneeling', 'all fours', 'arms up', 'hands behind head', 'touching breasts', 'masturbation'],
             fetish: ['ahegao', 'lactation', 'pregnant', 'bukkake', 'cumshot', 'creampie', 'anal', 'double penetration', 'tentacles', 'monster', 'futanari', 'urination', 'squirting', 'interracial', 'group sex'],
             bondage: ['bondage', 'rope bondage', 'handcuffs', 'collar', 'leash', 'chains', 'ball gag', 'blindfold', 'spreader bar', 'straitjacket', 'latex', 'leather', 'whip', 'spanking', 'cage'],
-            body: ['small breasts', 'medium breasts', 'large breasts', 'huge breasts', 'slim', 'curvy', 'thick thighs', 'wide hips'],
+            angle: ['close-up', 'medium shot', 'full body', 'from above', 'from below', 'side view', 'back view', 'three-quarter view', 'first person view', 'POV', 'overhead view', 'dutch angle', 'wide shot', 'macro shot', 'extreme close-up'],
+            background: ['bedroom', 'bathroom', 'living room', 'kitchen', 'office', 'classroom', 'library', 'park', 'beach', 'hotel room', 'outdoors', 'car interior', 'train', 'elevator', 'rooftop'],
             hairstyle: ['long hair', 'short hair', 'medium hair', 'twintails', 'ponytail', 'braided hair', 'bangs'],
             haircolor: ['blonde hair', 'brown hair', 'black hair', 'red hair', 'blue hair', 'pink hair', 'purple hair', 'white hair']
         };
@@ -586,7 +706,7 @@
 
         // カテゴリー表示切り替え
         function updateCategoryDisplay() {
-            ['age', 'people', 'background', 'clothing', 'pose', 'fetish', 'bondage', 'body', 'hair'].forEach(category => {
+            ['score', 'age', 'people', 'hair', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'].forEach(category => {
                 const displayToggle = document.getElementById(`display-${category}`);
                 const categoryDiv = document.getElementById(`category-${category}`);
                 
@@ -622,6 +742,15 @@
         function generatePrompt() {
             const parts = [];
             
+            // Scoreタグ
+            const displayScore = document.getElementById('display-score').checked;
+            if (displayScore) {
+                const options = document.querySelectorAll('#score-options input[type="checkbox"]:checked');
+                options.forEach(option => {
+                    parts.push(option.value);
+                });
+            }
+            
             // 年齢
             const displayAge = document.getElementById('display-age').checked;
             if (displayAge) {
@@ -631,8 +760,8 @@
                 }
             }
 
-            // 各カテゴリーの選択値を取得
-            ['people', 'background', 'clothing', 'pose', 'fetish', 'bondage', 'body', 'hairstyle', 'haircolor'].forEach(category => {
+            // 各カテゴリーの選択値を取得（新しい順序に対応）
+            ['people', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'].forEach(category => {
                 const displayToggle = document.getElementById(`display-${category === 'hairstyle' || category === 'haircolor' ? 'hair' : category}`);
                 
                 if (displayToggle && displayToggle.checked) {
@@ -690,7 +819,7 @@
                 document.getElementById('age').value = Math.floor(Math.random() * 20) + 18;
             }
 
-            ['people', 'background', 'clothing', 'pose', 'fetish', 'bondage', 'body', 'hair'].forEach(category => {
+            ['score', 'people', 'hair', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'].forEach(category => {
                 const randomToggle = document.getElementById(`random-${category}`);
                 if (randomToggle && randomToggle.checked) {
                     // 該当カテゴリーをクリア
@@ -961,9 +1090,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDsFfINMdoULzQbsJ6idMpaJ2tXzJsuumlkOjGsQroffNZiPZjoEdJpxRC0zAMfsUBpYEKxrelkfwsfHnQkFWBnui7CQuXy%2BPoymEHUbtfs4vLxG%2FOux37hiJxZsL52AuLsiLQierVts5SBp4GE%2BWxZsa9RJmqm90MnI1GJFKOvinSoOaRVu14CcfTs%2B%2FwYdFFEVtJAVZ8W2nrQN9Cl8wdy3dKXMSsVKw3VRW%2B67sOV%2FTwABDN09Frrnb%2FUTKNcFq2y0l%2BukhGfHVwHRfQMrxwnbhTf4gvZd78e3tv2f6PxDqrJdMZVBI2RVB%2BUDVyCZrRee%2Bgae3X7ABpYEtOY1H1QDflev0yHA37pv%2BDbm7vWylYaHh02E005ilzxn0LaJIlGuPPlTDTuHLskULTJL0B%2BeH4UniV2HUgMdtKj0GtwRbT5IxbfcCDSGPtyvhNs4WAia7nLj8Y%2B3tWuGAmcYwxCn%2FQSprdjlxUO4PYG9kEh35OM%2BWStVv%2F8qq1drKQN%2F0Lg%3D%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDoFguhIy4pPh1mYc3vpF0QQdCvOr%2FhcsTgAv8Syl5PQ7QS0%2B0qFMmO1QFfhxQbnIsQR4GcS4aX7gueO2qGo6CNgByZEIbqWgd1UMug5G77yOb78LtiJNq2t53wT0Vm3x%2Fu3WHzH1s5O80spOWOJd6zuZVjQbj7v5XDBt1iWIVyM03Yr4g4Rih2OjcGV4AoKlmPrt8cC9abMzrHHYE9Rly%2FyrBMIy6Da%2BH23ixhGJlVnC%2FAVr1er5EWXnBYiBtv9glB3ZoRgtgxQzgljJO8jzcnSqpOsBmsxWYQBJavQgKukYHEk2KNQ6uDOnHNXLsW5d%2FW1z0Du7qIz8Vw1bNvM9oq7svhLoUdiwtG6%2BhdZpYfi5MORx2vETHqB6Z%2FTdTTPxXpn6yGZt6zkGkN9E%2B1%2BSWhv3QXd6FI3evAZeQRXWUpO79S%2BIuDDgruoZgXjOz0BWLFhgu9BmBCGwMHS%2F7XD4TXG1VdFwrZMXCqYUA1w8Ek%2Bi9Tf9lQ57WkdX4ByZSvzC%2BA%3D%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDsFfINMdoULzQbsJ6idMpaJ2tXzJsuumlkOjGsQroffNZiPZjoEdJpxRC0zAMfsUBpYEKxrelkfwsfHnQkFWBnui7CQuXy+PoymEHUbtfs4vLxG/Oux37hiJxZsL52AuLsiLQierVts5SBp4GE+WxZsa9RJmqm90MnI1GJFKOvinSoOaRVu14CcfTs+/wYdFFEVtJAVZ8W2nrQN9Cl8wdy3dKXMSsVKw3VRW+67sOV/TwABDN09Frrnb/UTKNcFq2y0l+ukhGfHVwHRfQMrxwnbhTf4gvZd78e3tv2f6PxDqrJdMZVBI2RVB+UDVyCZrRee+gae3X7ABpYEtOY1H1QDflev0yHA37pv+Dbm7vWylYaHh02E005ilzxn0LaJIlGuPPlTDTuHLskULTJL0B+eH4UniV2HUgMdtKj0GtwRbT5IxbfcCDSGPtyvhNs4WAia7nLj8Y+3tWuGAmcYwxCn/QSprdjlxUO4PYG9kEh35OM+WStVv/8qq1drKQN/0Lg==";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDoFguhIy4pPh1mYc3vpF0QQdCvOr/hcsTgAv8Syl5PQ7QS0+0qFMmO1QFfhxQbnIsQR4GcS4aX7gueO2qGo6CNgByZEIbqWgd1UMug5G77yOb78LtiJNq2t53wT0Vm3x/u3WHzH1s5O80spOWOJd6zuZVjQbj7v5XDBt1iWIVyM03Yr4g4Rih2OjcGV4AoKlmPrt8cC9abMzrHHYE9Rly/yrBMIy6Da+H23ixhGJlVnC/AVr1er5EWXnBYiBtv9glB3ZoRgtgxQzgljJO8jzcnSqpOsBmsxWYQBJavQgKukYHEk2KNQ6uDOnHNXLsW5d/W1z0Du7qIz8Vw1bNvM9oq7svhLoUdiwtG6+hdZpYfi5MORx2vETHqB6Z/TdTTPxXpn6yGZt6zkGkN9E+1+SWhv3QXd6FI3evAZeQRXWUpO79S+IuDDgruoZgXjOz0BWLFhgu9BmBCGwMHS/7XD4TXG1VdFwrZMXCqYUA1w8Ek+i9Tf9lQ57WkdX4ByZSvzC+A==";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
