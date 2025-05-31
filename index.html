@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIプロンプト生成・管理ツール - 最終完成版</title>
+    <title>デルム式プロンプトジェネレーター</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -75,7 +75,7 @@
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
-            <i class="fas fa-magic mr-3"></i>AIプロンプト生成・管理ツール - 最終完成版
+            <i class="fas fa-magic mr-3"></i>デルム式プロンプトジェネレーター
         </h1>
 
         <!-- メインタブ -->
@@ -95,30 +95,6 @@
 
         <!-- プロンプト生成タブ -->
         <div id="content-generate" class="tab-content">
-            <!-- 生成されたプロンプト表示 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h3 class="text-xl font-bold mb-4"><i class="fas fa-text-width mr-2"></i>生成されたプロンプト</h3>
-                <div class="mb-4">
-                    <textarea id="generated-prompt" class="w-full h-32 px-3 py-2 border rounded-lg resize-none" readonly placeholder="プロンプトがここに生成されます..."></textarea>
-                </div>
-                <div class="flex gap-2">
-                    <button id="btn-copy-prompt" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-copy mr-2"></i>コピー
-                    </button>
-                    <select id="scene-select" class="px-3 py-2 border rounded-lg">
-                        <option value="1">シーン1</option>
-                        <option value="2">シーン2</option>
-                        <option value="3">シーン3</option>
-                        <option value="4">シーン4</option>
-                        <option value="5">シーン5</option>
-                        <option value="6">シーン6</option>
-                    </select>
-                    <button id="btn-save-prompt" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-save mr-2"></i>シーンに保存
-                    </button>
-                </div>
-            </div>
-
             <!-- 1. Scoreタグ設定 -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6" id="category-score">
                 <div class="flex items-center justify-between mb-4">
@@ -590,6 +566,30 @@
                     </button>
                     <button id="btn-clear-all" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
                         <i class="fas fa-eraser mr-2"></i>全クリア
+                    </button>
+                </div>
+            </div>
+
+            <!-- 生成されたプロンプト表示（最下部に移動） -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-text-width mr-2"></i>生成されたプロンプト</h3>
+                <div class="mb-4">
+                    <textarea id="generated-prompt" class="w-full h-32 px-3 py-2 border rounded-lg resize-none" readonly placeholder="プロンプトがここに生成されます..."></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-copy-prompt" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-copy mr-2"></i>コピー
+                    </button>
+                    <select id="scene-select" class="px-3 py-2 border rounded-lg">
+                        <option value="1">シーン1</option>
+                        <option value="2">シーン2</option>
+                        <option value="3">シーン3</option>
+                        <option value="4">シーン4</option>
+                        <option value="5">シーン5</option>
+                        <option value="6">シーン6</option>
+                    </select>
+                    <button id="btn-save-prompt" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>シーンに保存
                     </button>
                 </div>
             </div>
@@ -1090,9 +1090,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDoFguhIy4pPh1mYc3vpF0QQdCvOr%2FhcsTgAv8Syl5PQ7QS0%2B0qFMmO1QFfhxQbnIsQR4GcS4aX7gueO2qGo6CNgByZEIbqWgd1UMug5G77yOb78LtiJNq2t53wT0Vm3x%2Fu3WHzH1s5O80spOWOJd6zuZVjQbj7v5XDBt1iWIVyM03Yr4g4Rih2OjcGV4AoKlmPrt8cC9abMzrHHYE9Rly%2FyrBMIy6Da%2BH23ixhGJlVnC%2FAVr1er5EWXnBYiBtv9glB3ZoRgtgxQzgljJO8jzcnSqpOsBmsxWYQBJavQgKukYHEk2KNQ6uDOnHNXLsW5d%2FW1z0Du7qIz8Vw1bNvM9oq7svhLoUdiwtG6%2BhdZpYfi5MORx2vETHqB6Z%2FTdTTPxXpn6yGZt6zkGkN9E%2B1%2BSWhv3QXd6FI3evAZeQRXWUpO79S%2BIuDDgruoZgXjOz0BWLFhgu9BmBCGwMHS%2F7XD4TXG1VdFwrZMXCqYUA1w8Ek%2Bi9Tf9lQ57WkdX4ByZSvzC%2BA%3D%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDgHlCCGhyPDnCzTbXb3DfluFrJShIl4KL%2FCJVu%2FcPRClirS4boVspMVlDGWfDkkefnOiVbhgeSQp9w9Q9LzYUU2e1azsBCmpRuuXKAl0AWIDzCqevwrPtQXw%2B4dTPkIINpZ11ioHzJZYecwSI65OBGLAPluEw%2F6iOjhd0gBdyzvOep4TazRF%2FypeqPoMNdftfzh6%2Flq4%2F6na9Qw17pQyS6B%2B1svWNhWaUy0VmgFH7%2BuAFuiLRnDvyEJH04bFbRhlHfcjzswNVM%2FhtMRq339mEge9%2Bd13A1VealayEgcQ3JRU3BFiKnh8c21S7mwRgweEuLAOnnqpGzvYdRUMWtdC4rfZBBfIIBohnPPk8jclMj6xkvYIuS6EhUpuR19OK8rVdhP5w%2BomDSHcu%2Fd%2BNU%2F8wRc%2Fi%2FUmSNXP4wq6IWPcl1O2Vw4sZvk%2FWIaBuwEVvkSrXMNHDTe0xUqt%2BI0iIfjoRcO7Ut%2Bx24ec%2FDydcs6g8Da%2BJ1eScCXBIeapW2jWgJsDLA%3D%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDoFguhIy4pPh1mYc3vpF0QQdCvOr/hcsTgAv8Syl5PQ7QS0+0qFMmO1QFfhxQbnIsQR4GcS4aX7gueO2qGo6CNgByZEIbqWgd1UMug5G77yOb78LtiJNq2t53wT0Vm3x/u3WHzH1s5O80spOWOJd6zuZVjQbj7v5XDBt1iWIVyM03Yr4g4Rih2OjcGV4AoKlmPrt8cC9abMzrHHYE9Rly/yrBMIy6Da+H23ixhGJlVnC/AVr1er5EWXnBYiBtv9glB3ZoRgtgxQzgljJO8jzcnSqpOsBmsxWYQBJavQgKukYHEk2KNQ6uDOnHNXLsW5d/W1z0Du7qIz8Vw1bNvM9oq7svhLoUdiwtG6+hdZpYfi5MORx2vETHqB6Z/TdTTPxXpn6yGZt6zkGkN9E+1+SWhv3QXd6FI3evAZeQRXWUpO79S+IuDDgruoZgXjOz0BWLFhgu9BmBCGwMHS/7XD4TXG1VdFwrZMXCqYUA1w8Ek+i9Tf9lQ57WkdX4ByZSvzC+A==";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDgHlCCGhyPDnCzTbXb3DfluFrJShIl4KL/CJVu/cPRClirS4boVspMVlDGWfDkkefnOiVbhgeSQp9w9Q9LzYUU2e1azsBCmpRuuXKAl0AWIDzCqevwrPtQXw+4dTPkIINpZ11ioHzJZYecwSI65OBGLAPluEw/6iOjhd0gBdyzvOep4TazRF/ypeqPoMNdftfzh6/lq4/6na9Qw17pQyS6B+1svWNhWaUy0VmgFH7+uAFuiLRnDvyEJH04bFbRhlHfcjzswNVM/htMRq339mEge9+d13A1VealayEgcQ3JRU3BFiKnh8c21S7mwRgweEuLAOnnqpGzvYdRUMWtdC4rfZBBfIIBohnPPk8jclMj6xkvYIuS6EhUpuR19OK8rVdhP5w+omDSHcu/d+NU/8wRc/i/UmSNXP4wq6IWPcl1O2Vw4sZvk/WIaBuwEVvkSrXMNHDTe0xUqt+I0iIfjoRcO7Ut+x24ec/Dydcs6g8Da+J1eScCXBIeapW2jWgJsDLA==";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
