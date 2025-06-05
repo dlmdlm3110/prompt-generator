@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デルム式プロンプトジェネレーター v2.3</title>
+    <title>デルム式プロンプトジェネレーター v2.4</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -23,12 +23,14 @@
             background: #10b981 !important;
             color: white !important;
             border-color: #059669 !important;
+            font-weight: bold;
         }
         
         .checkbox-item.excluded {
             background: #ef4444 !important;
             color: white !important;
             border-color: #dc2626 !important;
+            text-decoration: line-through;
         }
         
         .checkbox-item:hover {
@@ -66,7 +68,7 @@
     <div class="container mx-auto p-4 max-w-6xl">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">デルム式プロンプトジェネレーター</h1>
-            <p class="text-lg text-gray-600">v2.3 - AI画像生成用高機能プロンプト作成ツール</p>
+            <p class="text-lg text-gray-600">v2.4 - AI画像生成用高機能プロンプト作成ツール</p>
         </header>
 
         <!-- タブナビゲーション -->
@@ -664,12 +666,12 @@
             
             if (state === 'selected') {
                 item.classList.add('selected');
-                item.innerHTML = '<i class="fas fa-check mr-2"></i>' + item.textContent.replace('✓ ', '').replace('✗ ', '');
+                item.innerHTML = '<i class="fas fa-check mr-2"></i>' + item.textContent.replace(/^(<i[^>]*><\/i>)\s*/, '');
             } else if (state === 'excluded') {
                 item.classList.add('excluded');
-                item.innerHTML = '<i class="fas fa-times mr-2"></i>' + item.textContent.replace('✓ ', '').replace('✗ ', '');
+                item.innerHTML = '<i class="fas fa-times mr-2"></i>' + item.textContent.replace(/^(<i[^>]*><\/i>)\s*/, '');
             } else {
-                item.innerHTML = item.textContent.replace('✓ ', '').replace('✗ ', '');
+                item.innerHTML = item.textContent.replace(/^(<i[^>]*><\/i>)\s*/, '');
             }
         }
 
@@ -736,7 +738,7 @@
 
         // 部分ランダム生成
         function partialRandom() {
-            const categories = ['score', 'count', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
+            const categories = ['score', 'count', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
             
             categories.forEach(category => {
                 const randomCheckbox = document.getElementById(`${category}-random`);
@@ -767,6 +769,42 @@
                     }
                 }
             });
+            
+            // 髪型・髪色の特別処理
+            const hairRandomCheckbox = document.getElementById('hair-random');
+            if (hairRandomCheckbox && hairRandomCheckbox.checked) {
+                ['hairstyle', 'haircolor'].forEach(category => {
+                    const items = Array.from(document.querySelectorAll(`[data-category="${category}"]`));
+                    
+                    // 現在の選択をクリア
+                    items.forEach(item => {
+                        const id = item.dataset.category + '_' + item.dataset.value;
+                        if (itemStates[id] === 'selected') {
+                            itemStates[id] = 'normal';
+                            updateItemVisual(item, 'normal');
+                        }
+                    });
+                    
+                    // 除外されていないアイテムからランダム選択
+                    const availableItems = items.filter(item => {
+                        const id = item.dataset.category + '_' + item.dataset.value;
+                        return itemStates[id] !== 'excluded';
+                    });
+                    
+                    if (availableItems.length > 0 && Math.random() > 0.3) {
+                        const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+                        const id = randomItem.dataset.category + '_' + randomItem.dataset.value;
+                        itemStates[id] = 'selected';
+                        updateItemVisual(randomItem, 'selected');
+                    }
+                });
+            }
+            
+            // 年齢のランダム化
+            const ageRandomCheckbox = document.getElementById('age-random');
+            if (ageRandomCheckbox && ageRandomCheckbox.checked) {
+                document.getElementById('age-input').value = Math.floor(Math.random() * 30) + 18;
+            }
             
             updatePrompt();
         }
@@ -924,9 +962,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDgzCkRzCazl%2BL%2BTByMD7QAKhaTd6txS8Qi0x6brIL35oRXPs27F3Jhae7VT9qxhLgnHcEWlwl7Js2v58Fs4rF7ojqeaWaBLJkRGBhJEC5%2FVhBauJh9CtYNUkdDODyBUHDqkcoM5yq5wPqjOxfb4udsa17lCPoqLbnAUIzrM5Dw%2Fasb6fhfP0LhgwcKcWIJ3zAHZOaIRVxSJgjCoudnOWeFDF7EJRNbGD4trA%2FwCCG0JHGoOs5PgX7H7GUnCg3hViOQZWKwi2DdkVyMV5sMbek0PvocnIBLYWeZH5P%2BiCl4sMzGlUUTnC6m8vwywCyzdS13g4QxOHeu7w4B8CgwgRz0T3DKoTv5dkFEZfXsqISp4Qu%2FQfG%2BQLxqlbFE81cAIkdaIqK7oGVgx2ULeHw1%2BeTU04xhmdQTtl%2By%2B8yTyQ3VV3ECqv%2F1lJYSZcfXi%2BxNUNp1Pu5CmqxxyWV1YBKnl%2BCy5GiEG6Og4lkyYOCHV%2BLd0u8Y3Gepv7C1GzhFQa5HjZ0mKkATm%2BsBzaT9R%2FBQuOKH8%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDh8hpBhboBSMW4xC4qP7j5Qe4Rn4GC61jz%2BewEOr5%2BLO2JbKyRnYIYCrrDeLRvxLnokYG2h2YEc6u4iCviQLBj29FfHW%2BmnucbG0FGOvSPEAljto%2BpiGiXb5lXRn4SjY%2BT5t5cjfRYOsgnFcqO9%2BYn5CrqCVcX3rHYwLupMgHcs2c7AJC6SJCbjYVxt%2BHdXKDKViNBMIO1CdKn%2F4PSd%2BMSyeXSvi9pb%2Bb4y%2FV7jroLK%2BuSSzOXq%2Fso4q2T6CspZNM2KL86vPW0GTIlDRE5w3JwT4hTpt1wwvXoOwnTdMs2DY5ENbHx8BirSoaH2kHe4tWzVq4c54MFXkh5iAK38romsRDZWJVKKutXETP3uv95BgYSYDvxsOWXEijUgPUKC1kKndDGZNdG3urXGd7aUpjDU2PvveFPA%2FqVZsQQoUBP9ttlQ4nzr8xey7AFLL8QfpgFdqKQKqXOsSnoHoFSAYXwheGrHaMK7Q4l1SyKn5LzhBBQ9TqG4yfwpRjr2fWNCfiIxe4FPUpaYMn92o4sruYtc%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDgzCkRzCazl+L+TByMD7QAKhaTd6txS8Qi0x6brIL35oRXPs27F3Jhae7VT9qxhLgnHcEWlwl7Js2v58Fs4rF7ojqeaWaBLJkRGBhJEC5/VhBauJh9CtYNUkdDODyBUHDqkcoM5yq5wPqjOxfb4udsa17lCPoqLbnAUIzrM5Dw/asb6fhfP0LhgwcKcWIJ3zAHZOaIRVxSJgjCoudnOWeFDF7EJRNbGD4trA/wCCG0JHGoOs5PgX7H7GUnCg3hViOQZWKwi2DdkVyMV5sMbek0PvocnIBLYWeZH5P+iCl4sMzGlUUTnC6m8vwywCyzdS13g4QxOHeu7w4B8CgwgRz0T3DKoTv5dkFEZfXsqISp4Qu/QfG+QLxqlbFE81cAIkdaIqK7oGVgx2ULeHw1+eTU04xhmdQTtl+y+8yTyQ3VV3ECqv/1lJYSZcfXi+xNUNp1Pu5CmqxxyWV1YBKnl+Cy5GiEG6Og4lkyYOCHV+Ld0u8Y3Gepv7C1GzhFQa5HjZ0mKkATm+sBzaT9R/BQuOKH8=";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDh8hpBhboBSMW4xC4qP7j5Qe4Rn4GC61jz+ewEOr5+LO2JbKyRnYIYCrrDeLRvxLnokYG2h2YEc6u4iCviQLBj29FfHW+mnucbG0FGOvSPEAljto+piGiXb5lXRn4SjY+T5t5cjfRYOsgnFcqO9+Yn5CrqCVcX3rHYwLupMgHcs2c7AJC6SJCbjYVxt+HdXKDKViNBMIO1CdKn/4PSd+MSyeXSvi9pb+b4y/V7jroLK+uSSzOXq/so4q2T6CspZNM2KL86vPW0GTIlDRE5w3JwT4hTpt1wwvXoOwnTdMs2DY5ENbHx8BirSoaH2kHe4tWzVq4c54MFXkh5iAK38romsRDZWJVKKutXETP3uv95BgYSYDvxsOWXEijUgPUKC1kKndDGZNdG3urXGd7aUpjDU2PvveFPA/qVZsQQoUBP9ttlQ4nzr8xey7AFLL8QfpgFdqKQKqXOsSnoHoFSAYXwheGrHaMK7Q4l1SyKn5LzhBBQ9TqG4yfwpRjr2fWNCfiIxe4FPUpaYMn92o4sruYtc=";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
