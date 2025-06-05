@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デルム式プロンプトジェネレーター v2.4</title>
+    <title>デルム式プロンプトジェネレーター v2.6</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -68,7 +68,7 @@
     <div class="container mx-auto p-4 max-w-6xl">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">デルム式プロンプトジェネレーター</h1>
-            <p class="text-lg text-gray-600">v2.4 - AI画像生成用高機能プロンプト作成ツール</p>
+            <p class="text-lg text-gray-600">v2.6 - AI画像生成用高機能プロンプト作成ツール</p>
         </header>
 
         <!-- タブナビゲーション -->
@@ -504,7 +504,8 @@
                         操作方法: 左クリック=選択切替、右クリック=除外設定<br>
                         状態表示: <span class="inline-block w-4 h-4 bg-green-500 rounded mr-1"></span>選択中　
                         <span class="inline-block w-4 h-4 bg-red-500 rounded mr-1"></span>除外中　
-                        <span class="inline-block w-4 h-4 bg-white border rounded mr-1"></span>未選択
+                        <span class="inline-block w-4 h-4 bg-white border rounded mr-1"></span>未選択<br>
+                        v2.6新機能: ランダム生成時、各カテゴリーで必ず1つ選択されます
                     </p>
                 </div>
             </div>
@@ -590,7 +591,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-2xl font-bold text-gray-800">全シーン一覧</h3>
                     <button onclick="copyAllScenes()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-all">
-                        <i class="fas fa-copy mr-2"></i>全シーンコピー（Wild Card形式）
+                        <i class="fas fa-copy mr-2"></i>全シーンコピー（テキスト形式）
                     </button>
                 </div>
                 <div id="all-scenes-display" class="bg-gray-50 p-4 rounded-lg min-h-40">
@@ -701,7 +702,7 @@
             document.getElementById('generated-prompt').textContent = prompt.join(', ');
         }
 
-        // 完全ランダム生成
+        // 完全ランダム生成（各カテゴリー必須選択保証）
         function fullRandom() {
             // 全て未選択にリセット
             document.querySelectorAll('.checkbox-item').forEach(item => {
@@ -712,7 +713,7 @@
                 }
             });
             
-            // 各カテゴリーからランダム選択
+            // 各カテゴリーからランダム選択（必ず1つ選択）
             const categories = ['score', 'count', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
             
             categories.forEach(category => {
@@ -722,7 +723,8 @@
                     return itemStates[id] !== 'excluded';
                 });
                 
-                if (availableItems.length > 0 && Math.random() > 0.3) {
+                // 必ず1つは選択する
+                if (availableItems.length > 0) {
                     const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
                     const id = randomItem.dataset.category + '_' + randomItem.dataset.value;
                     itemStates[id] = 'selected';
@@ -736,7 +738,7 @@
             updatePrompt();
         }
 
-        // 部分ランダム生成
+        // 部分ランダム生成（選択されたカテゴリーで必須選択保証）
         function partialRandom() {
             const categories = ['score', 'count', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
             
@@ -755,13 +757,13 @@
                         }
                     });
                     
-                    // 除外されていないアイテムからランダム選択
+                    // 除外されていないアイテムからランダム選択（必ず1つ選択）
                     const availableItems = items.filter(item => {
                         const id = item.dataset.category + '_' + item.dataset.value;
                         return itemStates[id] !== 'excluded';
                     });
                     
-                    if (availableItems.length > 0 && Math.random() > 0.3) {
+                    if (availableItems.length > 0) {
                         const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
                         const id = randomItem.dataset.category + '_' + randomItem.dataset.value;
                         itemStates[id] = 'selected';
@@ -770,7 +772,7 @@
                 }
             });
             
-            // 髪型・髪色の特別処理
+            // 髪型・髪色の特別処理（必須選択保証）
             const hairRandomCheckbox = document.getElementById('hair-random');
             if (hairRandomCheckbox && hairRandomCheckbox.checked) {
                 ['hairstyle', 'haircolor'].forEach(category => {
@@ -785,13 +787,13 @@
                         }
                     });
                     
-                    // 除外されていないアイテムからランダム選択
+                    // 除外されていないアイテムからランダム選択（必ず1つ選択）
                     const availableItems = items.filter(item => {
                         const id = item.dataset.category + '_' + item.dataset.value;
                         return itemStates[id] !== 'excluded';
                     });
                     
-                    if (availableItems.length > 0 && Math.random() > 0.3) {
+                    if (availableItems.length > 0) {
                         const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
                         const id = randomItem.dataset.category + '_' + randomItem.dataset.value;
                         itemStates[id] = 'selected';
@@ -907,9 +909,8 @@
             }
         }
 
-        // 全シーンをコピー
+        // 全シーンをコピー（テキスト形式）
         function copyAllScenes() {
-            let wildCard = '';
             let allPrompts = [];
             
             for (let i = 1; i <= 6; i++) {
@@ -917,9 +918,9 @@
             }
             
             if (allPrompts.length > 0) {
-                wildCard = '{' + allPrompts.join('|') + '}';
-                navigator.clipboard.writeText(wildCard).then(() => {
-                    alert('全シーンをWild Card形式でコピーしました！');
+                const textContent = allPrompts.join('\n');
+                navigator.clipboard.writeText(textContent).then(() => {
+                    alert('全シーンをテキスト形式でコピーしました！（各プロンプトが1行ずつ改行されています）');
                 });
             } else {
                 alert('保存されたプロンプトがありません');
@@ -962,9 +963,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDh8hpBhboBSMW4xC4qP7j5Qe4Rn4GC61jz%2BewEOr5%2BLO2JbKyRnYIYCrrDeLRvxLnokYG2h2YEc6u4iCviQLBj29FfHW%2BmnucbG0FGOvSPEAljto%2BpiGiXb5lXRn4SjY%2BT5t5cjfRYOsgnFcqO9%2BYn5CrqCVcX3rHYwLupMgHcs2c7AJC6SJCbjYVxt%2BHdXKDKViNBMIO1CdKn%2F4PSd%2BMSyeXSvi9pb%2Bb4y%2FV7jroLK%2BuSSzOXq%2Fso4q2T6CspZNM2KL86vPW0GTIlDRE5w3JwT4hTpt1wwvXoOwnTdMs2DY5ENbHx8BirSoaH2kHe4tWzVq4c54MFXkh5iAK38romsRDZWJVKKutXETP3uv95BgYSYDvxsOWXEijUgPUKC1kKndDGZNdG3urXGd7aUpjDU2PvveFPA%2FqVZsQQoUBP9ttlQ4nzr8xey7AFLL8QfpgFdqKQKqXOsSnoHoFSAYXwheGrHaMK7Q4l1SyKn5LzhBBQ9TqG4yfwpRjr2fWNCfiIxe4FPUpaYMn92o4sruYtc%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDsHs0HmjlyBzN9o4Rfr2TmlUUWFmaJrV%2Bk%2FFzU7CAWlD2Nc%2FbtvVpYAAK3qM5kPQtvzuPoTSDrRpbMH5ci%2F7T9K3D9hA3%2F2iPw6zAbQYuLXnxb7cx9UQ1Ez265vQfFs8Wm1ixLeYremgGNMyMfb549XVZvVApO7B98IfBSasrwYcesuSYVm%2FyUWfQcOLQH%2Fp34m5SiVWRymnt9B8DlVMMC1IDBl2BkQrUMelgHIMQVYEYLBB8V1Tqo6nWiq0c3mpBnHdQoi6n2cH%2Bn%2FUmt8XYHJCaXV8a7UKkAPQpW3cTa7cwtx5RJm1v9pTeWgtORwheefFly6f%2B%2BoioCpxsDmjCZRcy4jxNDL7sK0NzBcQW%2FZ6532PQMTHPYhJvnToQxNj2LTRGMomie0qcaiVQM70CmBD%2F6e7erYT0mpHq5hFJFkBQ07g5cSYY3E4KdExr%2FWZwuf5OmwOd3Q6Wxwjdm6p12mBNQ%2FolxY86jtT4%2BU%2BRgWXU1HnmQPRMYN7rwUR3ACnzeYfrHmZ913xNdRF8KGrYic%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDh8hpBhboBSMW4xC4qP7j5Qe4Rn4GC61jz+ewEOr5+LO2JbKyRnYIYCrrDeLRvxLnokYG2h2YEc6u4iCviQLBj29FfHW+mnucbG0FGOvSPEAljto+piGiXb5lXRn4SjY+T5t5cjfRYOsgnFcqO9+Yn5CrqCVcX3rHYwLupMgHcs2c7AJC6SJCbjYVxt+HdXKDKViNBMIO1CdKn/4PSd+MSyeXSvi9pb+b4y/V7jroLK+uSSzOXq/so4q2T6CspZNM2KL86vPW0GTIlDRE5w3JwT4hTpt1wwvXoOwnTdMs2DY5ENbHx8BirSoaH2kHe4tWzVq4c54MFXkh5iAK38romsRDZWJVKKutXETP3uv95BgYSYDvxsOWXEijUgPUKC1kKndDGZNdG3urXGd7aUpjDU2PvveFPA/qVZsQQoUBP9ttlQ4nzr8xey7AFLL8QfpgFdqKQKqXOsSnoHoFSAYXwheGrHaMK7Q4l1SyKn5LzhBBQ9TqG4yfwpRjr2fWNCfiIxe4FPUpaYMn92o4sruYtc=";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDsHs0HmjlyBzN9o4Rfr2TmlUUWFmaJrV+k/FzU7CAWlD2Nc/btvVpYAAK3qM5kPQtvzuPoTSDrRpbMH5ci/7T9K3D9hA3/2iPw6zAbQYuLXnxb7cx9UQ1Ez265vQfFs8Wm1ixLeYremgGNMyMfb549XVZvVApO7B98IfBSasrwYcesuSYVm/yUWfQcOLQH/p34m5SiVWRymnt9B8DlVMMC1IDBl2BkQrUMelgHIMQVYEYLBB8V1Tqo6nWiq0c3mpBnHdQoi6n2cH+n/Umt8XYHJCaXV8a7UKkAPQpW3cTa7cwtx5RJm1v9pTeWgtORwheefFly6f++oioCpxsDmjCZRcy4jxNDL7sK0NzBcQW/Z6532PQMTHPYhJvnToQxNj2LTRGMomie0qcaiVQM70CmBD/6e7erYT0mpHq5hFJFkBQ07g5cSYY3E4KdExr/WZwuf5OmwOd3Q6Wxwjdm6p12mBNQ/olxY86jtT4+U+RgWXU1HnmQPRMYN7rwUR3ACnzeYfrHmZ913xNdRF8KGrYic=";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
