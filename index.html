@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デルム式プロンプトジェネレーター v2.6</title>
+    <title>デルム式プロンプトジェネレーター v2.8</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -62,13 +62,18 @@
             background: #3b82f6;
             color: white;
         }
+
+        #generated-prompt-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto p-4 max-w-6xl">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">デルム式プロンプトジェネレーター</h1>
-            <p class="text-lg text-gray-600">v2.6 - AI画像生成用高機能プロンプト作成ツール</p>
+            <p class="text-lg text-gray-600">v2.8 - AI画像生成用高機能プロンプト作成ツール</p>
         </header>
 
         <!-- タブナビゲーション -->
@@ -234,6 +239,43 @@
                     <div class="checkbox-item" data-category="expression" data-value="ahegao">あえぎ顔</div>
                     <div class="checkbox-item" data-category="expression" data-value="worried">困った顔</div>
                     <div class="checkbox-item" data-category="expression" data-value="expressionless">無表情</div>
+                </div>
+            </div>
+
+            <!-- 表現 -->
+            <div class="category-section">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-droplet text-cyan-500 mr-2"></i>表現
+                    </h3>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="representation-display" checked onchange="updateDisplay()">
+                            <span class="ml-2">表示</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="representation-random" onchange="updateDisplay()">
+                            <span class="ml-2">ランダム</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div class="checkbox-item" data-category="representation" data-value="sweat">汗</div>
+                    <div class="checkbox-item" data-category="representation" data-value="sweating">発汗</div>
+                    <div class="checkbox-item" data-category="representation" data-value="sweat drops">汗のしずく</div>
+                    <div class="checkbox-item" data-category="representation" data-value="armpit sweat">腋の汗</div>
+                    <div class="checkbox-item" data-category="representation" data-value="glossy skin">光沢のある肌</div>
+                    <div class="checkbox-item" data-category="representation" data-value="wet skin">濡れた肌</div>
+                    <div class="checkbox-item" data-category="representation" data-value="drenched">びしょ濡れ</div>
+                    <div class="checkbox-item" data-category="representation" data-value="hot breath">熱い吐息</div>
+                    <div class="checkbox-item" data-category="representation" data-value="breath vapor">息の蒸気</div>
+                    <div class="checkbox-item" data-category="representation" data-value="panting">荒い息</div>
+                    <div class="checkbox-item" data-category="representation" data-value="steamy breath">湯気の吐息</div>
+                    <div class="checkbox-item" data-category="representation" data-value="blushing">赤面</div>
+                    <div class="checkbox-item" data-category="representation" data-value="flushed face">紅潮した顔</div>
+                    <div class="checkbox-item" data-category="representation" data-value="open mouth">開いた口</div>
+                    <div class="checkbox-item" data-category="representation" data-value="disheveled">乱れた</div>
+                    <div class="checkbox-item" data-category="representation" data-value="messy hair">乱れた髪</div>
                 </div>
             </div>
 
@@ -505,7 +547,7 @@
                         状態表示: <span class="inline-block w-4 h-4 bg-green-500 rounded mr-1"></span>選択中　
                         <span class="inline-block w-4 h-4 bg-red-500 rounded mr-1"></span>除外中　
                         <span class="inline-block w-4 h-4 bg-white border rounded mr-1"></span>未選択<br>
-                        v2.6新機能: ランダム生成時、各カテゴリーで必ず1つ選択されます
+                        v2.8新機能: プロンプト編集機能追加、各カテゴリーで必ず1つ選択されます
                     </p>
                 </div>
             </div>
@@ -515,8 +557,16 @@
                 <h3 class="text-xl font-bold text-blue-800 flex items-center mb-4">
                     <i class="fas fa-clipboard text-blue-600 mr-2"></i>生成されたプロンプト
                 </h3>
-                <div class="bg-white p-4 rounded-lg border min-h-20 mb-4">
-                    <div id="generated-prompt" class="text-gray-700 whitespace-pre-wrap">プロンプトがここに表示されます...</div>
+                <div class="mb-4">
+                    <textarea 
+                        id="generated-prompt-textarea" 
+                        class="w-full p-4 border rounded-lg text-gray-700 resize-vertical" 
+                        placeholder="プロンプトがここに表示されます..."
+                        rows="4"
+                    ></textarea>
+                    <div class="text-sm text-gray-600 mt-2">
+                        <i class="fas fa-edit mr-1"></i>自由に編集・加筆できます
+                    </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <button onclick="copyPrompt()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">
@@ -599,6 +649,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- ツール情報フッター -->
+        <footer class="mt-12 text-center">
+            <div class="bg-gray-800 text-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-2xl font-bold mb-2 flex items-center justify-center">
+                    <i class="fas fa-edit mr-3"></i>デルム式プロンプトジェネレーター v2.8
+                </h2>
+                <p class="text-gray-300 mb-4">効率的なAI画像生成のための高機能プロンプト作成ツール</p>
+                <p class="text-gray-400 text-sm mt-4">© 2024 デルム式プロンプトジェネレーター</p>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -687,7 +748,7 @@
             }
             
             // 各カテゴリーから選択されたアイテムを取得
-            const categories = ['score', 'count', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
+            const categories = ['score', 'count', 'hairstyle', 'haircolor', 'expression', 'representation', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
             
             categories.forEach(category => {
                 const items = document.querySelectorAll(`[data-category="${category}"]`);
@@ -699,7 +760,7 @@
                 });
             });
             
-            document.getElementById('generated-prompt').textContent = prompt.join(', ');
+            document.getElementById('generated-prompt-textarea').value = prompt.join(', ');
         }
 
         // 完全ランダム生成（各カテゴリー必須選択保証）
@@ -714,7 +775,7 @@
             });
             
             // 各カテゴリーからランダム選択（必ず1つ選択）
-            const categories = ['score', 'count', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
+            const categories = ['score', 'count', 'hairstyle', 'haircolor', 'expression', 'representation', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
             
             categories.forEach(category => {
                 const items = Array.from(document.querySelectorAll(`[data-category="${category}"]`));
@@ -740,7 +801,7 @@
 
         // 部分ランダム生成（選択されたカテゴリーで必須選択保証）
         function partialRandom() {
-            const categories = ['score', 'count', 'expression', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
+            const categories = ['score', 'count', 'expression', 'representation', 'body', 'clothing', 'pose', 'fetish', 'bondage', 'angle', 'background'];
             
             categories.forEach(category => {
                 const randomCheckbox = document.getElementById(`${category}-random`);
@@ -823,7 +884,7 @@
 
         // プロンプトをコピー
         function copyPrompt() {
-            const prompt = document.getElementById('generated-prompt').textContent;
+            const prompt = document.getElementById('generated-prompt-textarea').value;
             navigator.clipboard.writeText(prompt).then(() => {
                 alert('プロンプトをコピーしました！');
             });
@@ -832,7 +893,7 @@
         // シーンに保存
         function saveToScene() {
             const sceneNumber = document.getElementById('scene-select').value;
-            const prompt = document.getElementById('generated-prompt').textContent;
+            const prompt = document.getElementById('generated-prompt-textarea').value;
             
             if (prompt && prompt !== 'プロンプトがここに表示されます...') {
                 if (scenes[sceneNumber].length < 10) {
@@ -963,9 +1024,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDsHs0HmjlyBzN9o4Rfr2TmlUUWFmaJrV%2Bk%2FFzU7CAWlD2Nc%2FbtvVpYAAK3qM5kPQtvzuPoTSDrRpbMH5ci%2F7T9K3D9hA3%2F2iPw6zAbQYuLXnxb7cx9UQ1Ez265vQfFs8Wm1ixLeYremgGNMyMfb549XVZvVApO7B98IfBSasrwYcesuSYVm%2FyUWfQcOLQH%2Fp34m5SiVWRymnt9B8DlVMMC1IDBl2BkQrUMelgHIMQVYEYLBB8V1Tqo6nWiq0c3mpBnHdQoi6n2cH%2Bn%2FUmt8XYHJCaXV8a7UKkAPQpW3cTa7cwtx5RJm1v9pTeWgtORwheefFly6f%2B%2BoioCpxsDmjCZRcy4jxNDL7sK0NzBcQW%2FZ6532PQMTHPYhJvnToQxNj2LTRGMomie0qcaiVQM70CmBD%2F6e7erYT0mpHq5hFJFkBQ07g5cSYY3E4KdExr%2FWZwuf5OmwOd3Q6Wxwjdm6p12mBNQ%2FolxY86jtT4%2BU%2BRgWXU1HnmQPRMYN7rwUR3ACnzeYfrHmZ913xNdRF8KGrYic%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDjiwGHeI6qa8pcv7L59FSNAgyq5o8kuhyimNNySGinry0OZARIe1UhuzMdRfOLsoXG%2F45Wr6pmfVBIcnvJAEEjbBLP8e1ldHsdl3R7FiA%2FItAc%2FxXAcRl8KbEeZ3%2FKCZ81KOU%2FALziJrvP5Vjm%2Bj5SMI%2BL6%2FW6sbSuh9VEQpp8yWNgzBkRaBTpTrCupVWN5CwjPgfKJCBEhfkqdlhOjgb177QNALriAQ0l33bYqr9C0qYExsp8JQuWlNMvK1fXT%2BSaQc1D%2FEZS2dys1hen8UPZakeu7%2BFOCLWKEzmHctDtfKsCtP58TdbywR7QIYZ5la5VMp0%2BJVaouWOcoJgOzSXZUm3qJGVR5xIQhqGr%2B9WXf8ej31fx%2Fyu2HNtNKJUvKyct3thVJhP5hNk%2BRr%2BDHjsl5eH3mF00RfkEdSBYboo%2BG2ZfssOWjRv44h%2BnNV%2B3%2Fsqyqxd1GqO0ivQ8Vr55jok5JAFNzO3TuRJb9ypfd7fscHaPt%2BQQ%2FQznRNIQmn17JNpA%3D%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDsHs0HmjlyBzN9o4Rfr2TmlUUWFmaJrV+k/FzU7CAWlD2Nc/btvVpYAAK3qM5kPQtvzuPoTSDrRpbMH5ci/7T9K3D9hA3/2iPw6zAbQYuLXnxb7cx9UQ1Ez265vQfFs8Wm1ixLeYremgGNMyMfb549XVZvVApO7B98IfBSasrwYcesuSYVm/yUWfQcOLQH/p34m5SiVWRymnt9B8DlVMMC1IDBl2BkQrUMelgHIMQVYEYLBB8V1Tqo6nWiq0c3mpBnHdQoi6n2cH+n/Umt8XYHJCaXV8a7UKkAPQpW3cTa7cwtx5RJm1v9pTeWgtORwheefFly6f++oioCpxsDmjCZRcy4jxNDL7sK0NzBcQW/Z6532PQMTHPYhJvnToQxNj2LTRGMomie0qcaiVQM70CmBD/6e7erYT0mpHq5hFJFkBQ07g5cSYY3E4KdExr/WZwuf5OmwOd3Q6Wxwjdm6p12mBNQ/olxY86jtT4+U+RgWXU1HnmQPRMYN7rwUR3ACnzeYfrHmZ913xNdRF8KGrYic=";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDjiwGHeI6qa8pcv7L59FSNAgyq5o8kuhyimNNySGinry0OZARIe1UhuzMdRfOLsoXG/45Wr6pmfVBIcnvJAEEjbBLP8e1ldHsdl3R7FiA/ItAc/xXAcRl8KbEeZ3/KCZ81KOU/ALziJrvP5Vjm+j5SMI+L6/W6sbSuh9VEQpp8yWNgzBkRaBTpTrCupVWN5CwjPgfKJCBEhfkqdlhOjgb177QNALriAQ0l33bYqr9C0qYExsp8JQuWlNMvK1fXT+SaQc1D/EZS2dys1hen8UPZakeu7+FOCLWKEzmHctDtfKsCtP58TdbywR7QIYZ5la5VMp0+JVaouWOcoJgOzSXZUm3qJGVR5xIQhqGr+9WXf8ej31fx/yu2HNtNKJUvKyct3thVJhP5hNk+Rr+DHjsl5eH3mF00RfkEdSBYboo+G2ZfssOWjRv44h+nNV+3/sqyqxd1GqO0ivQ8Vr55jok5JAFNzO3TuRJb9ypfd7fscHaPt+QQ/QznRNIQmn17JNpA==";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
