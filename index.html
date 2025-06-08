@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デルム式プロンプトジェネレーター v2.9</title>
+    <title>デルム式プロンプトジェネレーター v3.0</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
@@ -49,7 +49,7 @@
             <h1 class="text-4xl font-bold text-gray-800 mb-2">
                 <i class="fas fa-magic text-purple-600"></i> デルム式プロンプトジェネレーター
             </h1>
-            <p class="text-gray-600">v2.9 - AI画像生成用高機能プロンプト作成ツール</p>
+            <p class="text-gray-600">v3.0 - AI画像生成用高機能プロンプト作成ツール</p>
         </div>
 
         <!-- タブメニュー -->
@@ -338,6 +338,37 @@
                 </div>
             </div>
 
+            <!-- 部活 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-orange-600">
+                        <i class="fas fa-running"></i> 部活
+                    </h3>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="club-display" class="mr-2" checked>
+                            <span class="text-sm">表示</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="club-random" class="mr-2">
+                            <span class="text-sm">ランダム</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="club-container">
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="soccer uniform">サッカー部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="baseball uniform">野球・ソフトボール部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="basketball uniform">バスケ部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="tennis uniform">テニス部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="volleyball uniform">バレーボール部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="marching band uniform">マーチングバンド部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="judo gi">柔道・空手部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="track and field uniform">陸上部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="cheerleader outfit">チアリーディング部</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="competition swimsuit">水泳部</div>
+                </div>
+            </div>
+
             <!-- ポーズ -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <div class="flex items-center justify-between mb-4">
@@ -467,18 +498,18 @@
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="sweat">汗</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="sweating">発汗</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="sweat drops">汗のしずく</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="armpit sweat">腋の汗</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="glossy skin">光沢のある肌</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="armpit sweat">腋汗</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="glossy skin">光沢肌</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="wet skin">濡れた肌</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="drenched">びしょ濡れ</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="hot breath">熱い吐息</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="drenched">ずぶ濡れ</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="hot breath">熱い息</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="breath vapor">息の蒸気</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="panting">息切れ</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="steamy breath">湯気のような吐息</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="panting">荒い息</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="steamy breath">湯気の息</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="blushing">赤面</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="flushed face">紅潮した顔</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="open mouth">開いた口</div>
-                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="disheveled">乱れた</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="disheveled">乱れた状態</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="messy hair">乱れた髪</div>
                 </div>
             </div>
@@ -547,6 +578,42 @@
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="train">電車</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="elevator">エレベーター</div>
                     <div class="checkbox-item p-3 rounded-lg text-center" data-value="rooftop">屋上</div>
+                </div>
+            </div>
+
+            <!-- 部活連携 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-orange-600">
+                        <i class="fas fa-dumbbell"></i> 部活連携
+                    </h3>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="clubrelated-display" class="mr-2" checked>
+                            <span class="text-sm">表示</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="clubrelated-random" class="mr-2">
+                            <span class="text-sm">ランダム</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="clubrelated-container">
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="equipment room, gym storage, cluttered, sports gear">体育館倉庫</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="indoor gym, wooden floor, high ceiling, basketball hoop">体育館</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="locker room, benches, open lockers, towel, pony inside">更衣室</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="indoor pool, tiled walls, diving board, pony in swimsuit">プール</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="poolside, clear blue water, sunny, beach towel">プールサイド</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="dojo, tatami mats, martial arts practice, traditional">柔道場</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="running track, red lanes, grassy field, stadium">陸上競技場</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="soccer field, green grass, goal posts, clear sky">サッカーコート</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="schoolyard, dusty field, white lines, outdoor">運動場</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="exercise room, weights, treadmill, mirror, gym pony">スポーツジム</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="tennis court, net, racket, bright daylight">テニスコート</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="basketball court, court lines, hoop, gym background">バスケットコート</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="volleyball court, centered net, gym setting">バレーコート</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="baseball diamond, dugout, pony with bat, sunny sky">野球場</div>
+                    <div class="checkbox-item p-3 rounded-lg text-center" data-value="team bench room, tactics board, towels, water bottles">ベンチ室（控室）</div>
                 </div>
             </div>
 
@@ -698,7 +765,7 @@
         <!-- フッター -->
         <div class="text-center mt-8 bg-gray-800 text-white p-6 rounded-lg">
             <h3 class="text-xl font-bold mb-2">
-                <i class="fas fa-magic"></i> デルム式プロンプトジェネレーター v2.9
+                <i class="fas fa-magic"></i> デルム式プロンプトジェネレーター v3.0
             </h3>
             <p class="text-gray-300">効率的なAI画像生成のための高機能プロンプト作成ツール</p>
             <p class="text-gray-400 text-sm mt-2">© 2024 デルム式プロンプトジェネレーター</p>
@@ -728,7 +795,7 @@
             document.getElementById('tab-all-scenes').addEventListener('click', () => switchTab('all-scenes'));
 
             // チェックボックス項目のクリックイベント
-            const categories = ['pony', 'illustrious', 'rating', 'age', 'people', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'sm', 'representations', 'angle', 'background'];
+            const categories = ['pony', 'illustrious', 'rating', 'age', 'people', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'club', 'pose', 'fetish', 'sm', 'representations', 'angle', 'background', 'clubrelated'];
             
             categories.forEach(category => {
                 const container = document.getElementById(category + '-container');
@@ -847,12 +914,14 @@
                 'expression': 'expression-container',
                 'body': 'body-container',
                 'clothing': 'clothing-container',
+                'club': 'club-container',
                 'pose': 'pose-container',
                 'fetish': 'fetish-container',
                 'sm': 'sm-container',
                 'representations': 'representations-container',
                 'angle': 'angle-container',
-                'background': 'background-container'
+                'background': 'background-container',
+                'clubrelated': 'clubrelated-container'
             };
 
             let promptParts = [];
@@ -897,12 +966,14 @@
                 'expression-container': true,
                 'body-container': true,
                 'clothing-container': true,
+                'club-container': false,
                 'pose-container': true,
                 'fetish-container': false,
                 'sm-container': false,
                 'representations-container': false,
                 'angle-container': true,
-                'background-container': true
+                'background-container': true,
+                'clubrelated-container': false
             };
 
             Object.keys(categories).forEach(containerId => {
@@ -917,7 +988,7 @@
 
         // 部分ランダム生成
         function generatePartialRandom() {
-            const categories = ['pony', 'illustrious', 'rating', 'age', 'people', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'pose', 'fetish', 'sm', 'representations', 'angle', 'background'];
+            const categories = ['pony', 'illustrious', 'rating', 'age', 'people', 'hairstyle', 'haircolor', 'expression', 'body', 'clothing', 'club', 'pose', 'fetish', 'sm', 'representations', 'angle', 'background', 'clubrelated'];
             
             categories.forEach(category => {
                 const randomCheckbox = document.getElementById(category + '-random');
@@ -1194,9 +1265,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDtBkpeJ4POtierR%2B1lLw6NyszMlZ4lgQuKrF86A5%2FW4KKivKC4mcOr2fIwfG3CfcJmUQh2NcGnTq%2Br1roGggYmrr8TdKiLPBTz4y0J2HRvFX7iCjVGE0%2FG40hjc0CxgZSxYrVTfBHECZwNXQ6z%2FLnRIu7adX0LXKRNO1r1oCvMa77nbvjnEaO56doBQ7AQgCqG09Ba6mlA3vlJQGPzYdn%2FxzwMmS4Mf2NGx9wlSxR0xGsa9USPtlaCDUTqEhzRWYdOkGooIJhROqUtOdaQo%2FNtswB3FHlzoeyuNwRGMqS66ZgsRYAAFvQfoj8LmiSHOKcVaUGoXmtVxl%2BXPgvFum2SSPZWhNhNaHoNXXBK9E4MYf%2FRHqiY9xERlGrwv2yeqny8AvNtfIu3fLgpMnADMX20H%2BZ23B1F1htLygWGDcsPKcby9O%2B0j8QciNJ%2B4RZpjcPWhtm9dHUN%2FxvZLAdoNNMZ5usw6wNoJPL3lnfN3S%2Brn%2BTShKKSbvpXsCNMESer%2Fn5p3SBayNFn3mvdWPsY73zA0%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDs11qXy2cguFFqNkPhb1dzOXfRKn1ysIZEhFUDwJJnRNHJh5XGPYsrCVARk2w7tZTkbBLZsgaHUlkCWy9jq%2FXSA%2FuTz91Zm8%2Fd7gS1Jx6dRW0tgenLQFbjyNU0PQ3bkJVeJ8wQ8q0Ze1PU4pVxrLMM%2B14aeh%2BNR0JVs9Tu6XGZMH6oqYGFe5lNy2NmSCpKjcUNBsFckboKgaXJ%2FlCxaWeje%2Bt4efeDklMK4E6LOhXorYJew8XhS7HmKJUxy4ZfBvwAG%2F0rZ%2Fk7AsuRB29r9usEJTEocb2dqD7NaAD6iJcC79uAa1xtpQ3c5TfEnKWthbe8vpYMFXaKy6%2B95emwXBzsLsIp4RSA%2BhRMnDmse2uXmfNO3%2FCjH9%2Ft0j5R85vdeQbRHNi0p9Ms8DhH5gIWB7f8z9%2Bb74bSxig13NRUXd18BM5EEAIMrwjlvJDrEMFxJyALIAfxiNvMyL93dUSBI3xtBHTxmeizb9yjAGY7qQiiWyu4bhN6mpVmIpZfl1u3qp4kt2tvz5srTRwqvU7B3SyKk%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDtBkpeJ4POtierR+1lLw6NyszMlZ4lgQuKrF86A5/W4KKivKC4mcOr2fIwfG3CfcJmUQh2NcGnTq+r1roGggYmrr8TdKiLPBTz4y0J2HRvFX7iCjVGE0/G40hjc0CxgZSxYrVTfBHECZwNXQ6z/LnRIu7adX0LXKRNO1r1oCvMa77nbvjnEaO56doBQ7AQgCqG09Ba6mlA3vlJQGPzYdn/xzwMmS4Mf2NGx9wlSxR0xGsa9USPtlaCDUTqEhzRWYdOkGooIJhROqUtOdaQo/NtswB3FHlzoeyuNwRGMqS66ZgsRYAAFvQfoj8LmiSHOKcVaUGoXmtVxl+XPgvFum2SSPZWhNhNaHoNXXBK9E4MYf/RHqiY9xERlGrwv2yeqny8AvNtfIu3fLgpMnADMX20H+Z23B1F1htLygWGDcsPKcby9O+0j8QciNJ+4RZpjcPWhtm9dHUN/xvZLAdoNNMZ5usw6wNoJPL3lnfN3S+rn+TShKKSbvpXsCNMESer/n5p3SBayNFn3mvdWPsY73zA0=";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDs11qXy2cguFFqNkPhb1dzOXfRKn1ysIZEhFUDwJJnRNHJh5XGPYsrCVARk2w7tZTkbBLZsgaHUlkCWy9jq/XSA/uTz91Zm8/d7gS1Jx6dRW0tgenLQFbjyNU0PQ3bkJVeJ8wQ8q0Ze1PU4pVxrLMM+14aeh+NR0JVs9Tu6XGZMH6oqYGFe5lNy2NmSCpKjcUNBsFckboKgaXJ/lCxaWeje+t4efeDklMK4E6LOhXorYJew8XhS7HmKJUxy4ZfBvwAG/0rZ/k7AsuRB29r9usEJTEocb2dqD7NaAD6iJcC79uAa1xtpQ3c5TfEnKWthbe8vpYMFXaKy6+95emwXBzsLsIp4RSA+hRMnDmse2uXmfNO3/CjH9/t0j5R85vdeQbRHNi0p9Ms8DhH5gIWB7f8z9+b74bSxig13NRUXd18BM5EEAIMrwjlvJDrEMFxJyALIAfxiNvMyL93dUSBI3xtBHTxmeizb9yjAGY7qQiiWyu4bhN6mpVmIpZfl1u3qp4kt2tvz5srTRwqvU7B3SyKk=";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
